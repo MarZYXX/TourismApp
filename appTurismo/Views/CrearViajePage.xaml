@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="appTurismo.Views.CrearViajePage"
+             Title="{Binding Title}">
+
+    <VerticalStackLayout Padding="20" Spacing="20">
+        <Label Text="Configurar Nuevo Recorrido" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center" />
+
+        <Entry Placeholder="Nombre del Viaje (Ej. Cueva del Oso)" 
+               Text="{Binding NombrePaquete}" 
+               FontSize="16" />
+
+        <Button Text="💾 Guardar Viaje" 
+                Command="{Binding GuardarViajeCommand}" 
+                BackgroundColor="#4CAF50" 
+                TextColor="White" 
+                HeightRequest="50" 
+                CornerRadius="8"/>
+    </VerticalStackLayout>
+</ContentPage>
