@@ -19,6 +19,8 @@ namespace appTurismo.ViewModels
 
         public ICommand VerMapaCommand { get; }
 
+        public ICommand GestionarCheckpointsCommand { get; }
+
         public AdminDashViewModel(IViajeService viajeService)
         {
             _viajeService = viajeService;
@@ -29,7 +31,17 @@ namespace appTurismo.ViewModels
 
             IrCrearViajeCommand = new Command(async () => await Shell.Current.GoToAsync("CrearViajePage"));
 
-            VerMapaCommand = new Command(async () => await Shell.Current.GoToAsync("MapaPage"));
+            VerMapaCommand = new Command<GrupoTour>(async (viaje) =>
+            {
+                Preferences.Set("ViajeSeleccionado", viaje.IdTourGroup);
+                await Shell.Current.GoToAsync("MapaPage");
+            });
+
+            GestionarCheckpointsCommand = new Command<GrupoTour>(async (viaje) =>
+            {
+                Preferences.Set("ViajeSeleccionado", viaje.IdTourGroup);
+                await Shell.Current.GoToAsync("GestionarCheckpointsPage");
+            });
         }
 
         private async Task CargarDashboard()

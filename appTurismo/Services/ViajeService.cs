@@ -8,12 +8,11 @@ namespace appTurismo.Services
     public interface IViajeService
     {
         Task<List<GrupoTour>> GetGuideTripsAsync(string guiaId);
-        Task CreateTripAsync(GrupoTour grupo);
+        Task CreateTripAsync(GrupoTour grupo, List<Checkpoint> puntos);
     }
 
     public class ViajeService : IViajeService
     {
-        // 1. SOLUCIÓN AL ERROR CS0103: Inyectamos el cliente de Supabase
         private readonly Supabase.Client _supabaseClient;
 
         public ViajeService(Supabase.Client supabaseClient)
@@ -21,43 +20,73 @@ namespace appTurismo.Services
             _supabaseClient = supabaseClient;
         }
 
-        // Dejamos tu memoria RAM activa para que tus ejemplos sigan viéndose al instante
-        private static List<GrupoTour> _viajesSimulados = new List<GrupoTour>
-        {
-            new GrupoTour { IdTourGroup = "BOSQUE-001", Estado = "Active", FechaInicio = DateTime.Now },
-            new GrupoTour { IdTourGroup = "CASCADA-002", Estado = "Planned", FechaInicio = DateTime.Now.AddDays(2) }
-        };
-
+        // 1. AHORA LEEMOS LOS VIAJES REALES DE SUPABASE
         public async Task<List<GrupoTour>> GetGuideTripsAsync(string guiaId)
         {
-            return _viajesSimulados;
-        }
-
-        // 2. SOLUCIÓN AL ERROR CS0535: Recibimos GrupoTour y lo transformamos para Supabase
-        public async Task CreateTripAsync(GrupoTour grupo)
-        {
-            // Primero, lo guardamos localmente para que se vea en tu pantalla de inmediato
-            grupo.Estado = "Active";
-            _viajesSimulados.Add(grupo);
-
+            var lista = new List<GrupoTour>();
             try
             {
-                // Preparamos el paquete exacto para tu base de datos
+                var respuesta = await _supabaseClient.From<Grupo>().Get();
+
+                foreach (var g in respuesta.Models)
+                {
+                    lista.Add(new GrupoTour
+                    {
+                        IdTourGroup = g.IdTourGroup,
+                        Nombre = g.Nombre ?? "Viaje Sin Nombre", // Si es NULL, pone esto
+                        Estado = g.Estado,
+                        FechaInicio = g.FechaInicio
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error al leer viajes: {ex.Message}");
+            }
+            return lista;
+        }
+
+        // 2. AHORA GUARDAMOS CON EL NOMBRE Y EL UUID CORRECTO
+        public async Task CreateTripAsync(GrupoTour grupo, List<Checkpoint> puntos)
+        {
+            try
+            {
                 var nuevoGrupoSupabase = new Grupo
                 {
-                    // IMPORTANTE: Tu tabla de Supabase exige que el ID sea un código UUID válido.
-                    // Si le mandas "Nájera", Supabase crasheará. Así que le generamos un código real:
-                    IdTourGroup = Guid.NewGuid().ToString(),
+                    IdTourGroup = grupo.IdTourGroup, // Como pusimos 'true', Supabase respetará este ID
+                    Nombre = grupo.Nombre,
                     Estado = "Activo",
                     FechaInicio = grupo.FechaInicio
                 };
 
-                // Enviamos el registro a la nube
+                // 1. Guardamos el Grupo
                 await _supabaseClient.From<Grupo>().Insert(nuevoGrupoSupabase);
+
+                // 2. Guardamos los Checkpoints vinculados a ese MISMO ID
+                if (puntos != null && puntos.Count > 0)
+                {
+                    int orden = 1;
+                    foreach (var p in puntos)
+                    {
+                        p.IdCheckpoint = Guid.NewGuid().ToString(); // Generamos el ID del punto
+                        p.IdGrupo = grupo.IdTourGroup;              // Lo enlazamos fuertemente al Grupo
+                        p.Orden = orden;
+
+                        try
+                        {
+                            await _supabaseClient.From<Checkpoint>().Insert(p);
+                        }
+                        catch (Exception exPunto)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[ERROR PUNTO]: {exPunto.Message}");
+                        }
+                        orden++;
+                    }
+                }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error al guardar en Supabase: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"[ERROR GRUPO]: {ex.Message}");
             }
         }
     }

@@ -21,19 +21,19 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Margin="0,8" Padding="15" CornerRadius="12" BorderColor="#4CAF50" BackgroundColor="#F9FBE7">
-                            <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, Auto">
-                                <Label Grid.Row="0" Grid.Column="0" Text="{Binding IdTourGroup}" FontSize="18" FontAttributes="Bold" TextColor="#2E7D32" />
+                            <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *">
+                                <Label Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Nombre}" FontSize="18" FontAttributes="Bold" TextColor="#2E7D32" />
+                                <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding FechaInicio, StringFormat='Inicio: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="#555" Margin="0,5,0,10" />
 
-                                <Frame Grid.Row="0" Grid.Column="1" BackgroundColor="#4CAF50" Padding="8,4" CornerRadius="6">
-                                    <Label Text="{Binding Estado}" TextColor="White" FontSize="12" FontAttributes="Bold"/>
-                                </Frame>
-
-                                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding FechaInicio, StringFormat='Inicio: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="#555" Margin="0,5,0,0" />
-
-                                <Button Grid.Row="2" Grid.ColumnSpan="2" Text="🗺️ Ver Mapa en Vivo"
+                                <Button Grid.Row="2" Grid.Column="0" Text="🗺️ Mapa"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerMapaCommand}"
                                         CommandParameter="{Binding .}"
-                                        BackgroundColor="#FF9800" TextColor="White" HeightRequest="40" CornerRadius="8" Margin="0,10,0,0"/>
+                                        BackgroundColor="#FF9800" TextColor="White" HeightRequest="40" CornerRadius="8" Margin="0,0,5,0"/>
+
+                                <Button Grid.Row="2" Grid.Column="1" Text="✅ Checkpoints"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.GestionarCheckpointsCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#4CAF50" TextColor="White" HeightRequest="40" CornerRadius="8" Margin="5,0,0,0"/>
                             </Grid>
                         </Frame>
                     </DataTemplate>

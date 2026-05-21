@@ -64,6 +64,9 @@ namespace appTurismo
             builder.Services.AddTransient<CrearViajePage>();
             builder.Services.AddTransient<MapaPage>();
 
+            builder.Services.AddTransient<GestionarCheckpointsViewModel>();
+            builder.Services.AddTransient<GestionarCheckpointsPage>();
+
             return builder.Build();
         }
     }
