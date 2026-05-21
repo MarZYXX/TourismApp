@@ -1,6 +1,8 @@
 ﻿using appTurismo.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.Threading.Tasks;
+using Microsoft.Maui.Networking; // Actualizado para MAUI
 
 namespace appTurismo.ViewModels
 {
@@ -29,28 +31,45 @@ namespace appTurismo.ViewModels
 
             if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
             {
-                await Shell.Current.DisplayAlert("Campos Vacíos", "Por favor ingresa tu correo y contraseña.", "OK");
+                await Shell.Current.DisplayAlertAsync("Campos Vacíos", "Por favor ingresa tu correo y contraseña.", "OK");
                 return;
             }
 
             if (_connectivity.NetworkAccess != NetworkAccess.Internet)
             {
-                await Shell.Current.DisplayAlert("Sin Conexión", "Revisa tu conexión a internet.", "OK");
+                await Shell.Current.DisplayAlertAsync("Sin Conexión", "Revisa tu conexión a internet.", "OK");
                 return;
             }
 
             IsBusy = true;
-            bool success = await _userService.LoginAsync(Email, Password);
+
+            // AQUÍ ESTABA EL ERROR: Ahora guardamos el texto del rol ("guia" o "turista")
+            string? userRole = await _userService.LoginAsync(Email, Password);
+
             IsBusy = false;
 
-            if (success)
+            // Si el rol NO está vacío, significa que el login fue exitoso
+            if (!string.IsNullOrEmpty(userRole))
             {
-                // Route safely into your main container shell mapping context
-                await Shell.Current.GoToAsync("//MainPage");
+                if (userRole == "guia")
+                {
+                    // Te manda al panel que ya tenemos terminado
+                    await Shell.Current.GoToAsync("//AdminPage");
+                }
+                else if (userRole == "turista")
+                {
+                    // Te mandará a la futura pantalla del Turista
+                    // Por ahora la dejamos apuntando a MainPage o a la que tengas
+                    await Shell.Current.GoToAsync("//UserPage");
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlertAsync("Error", "Tu cuenta no tiene un rol válido asignado.", "OK");
+                }
             }
             else
             {
-                await Shell.Current.DisplayAlert("Error", "Credenciales incorrectas. Intenta de nuevo.", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", "Credenciales incorrectas o problemas de cuenta. Intenta de nuevo.", "OK");
             }
         }
 

@@ -6,7 +6,7 @@ namespace appTurismo.Models.Supabase
     [Table("usuarios")]
     public class User : BaseModel
     {
-        [PrimaryKey("id_usuario", false)]
+        [PrimaryKey("id_usuario", true)]
         public Guid Id_usuario { get; set; }
 
         [Column("nombre")]
