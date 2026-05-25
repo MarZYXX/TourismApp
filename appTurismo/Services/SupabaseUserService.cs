@@ -4,14 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using appTurismo.Models;
+using Supabase.Postgrest.Exceptions;
 
 namespace appTurismo.Services
 {
     public class SupabaseUserService : IUserService
     {
         private readonly Supabase.Client _supabaseClient;
-
-        // Quitamos _userMapper porque nos estaba causando errores al no estar declarado
         public SupabaseUserService(Supabase.Client supabaseClient)
         {
             _supabaseClient = supabaseClient;
@@ -23,39 +22,23 @@ namespace appTurismo.Services
         {
             try
             {
-                // 1. Autenticación estándar
                 var session = await _supabaseClient.Auth.SignIn(email, password);
                 if (session?.User == null) return null;
 
-                // 2. CONSULTA DIRECTA (Sin usar RPC)
-                // Buscamos el usuario en la tabla 'usuarios'
-                var userResponse = await _supabaseClient.From<Models.Supabase.User>()
-                    .Where(u => u.Id_usuario == Guid.Parse(session.User.Id))
-                    .Get();
+                var rol = await _supabaseClient.Rpc<string>("get_user_role", new Dictionary<string, object>
+                {
+                    { "user_uuid", Guid.Parse(session.User.Id) }
+                });
 
-                var usuario = userResponse.Models.FirstOrDefault();
-                if (usuario == null) return null;
-
-                // 3. Buscamos el rol directamente en la tabla 'roles'
-                var roleResponse = await _supabaseClient.From<Models.Supabase.Role>()
-                    .Where(r => r.Id_rol == usuario.Id_rol)
-                    .Get();
-
-                var rol = roleResponse.Models.FirstOrDefault();
-
-                // Retornamos el nombre del rol (ej: "guia" o "turista")
-                return rol?.Nombre?.ToLower().Trim();
+                return rol?.ToLower().Trim();
             }
             catch (Exception ex)
             {
-                // Esto imprimirá el error real en la ventana de "Salida"
-                Debug.WriteLine($"[ERROR FATAL DE SUPABASE]: {ex.Message}");
-                Debug.WriteLine($"[STACK TRACE]: {ex.StackTrace}");
+                Debug.WriteLine($"Error Login RPC: {ex.Message}");
                 return null;
             }
         }
 
-        // --- ESTE MÉTODO SOLUCIONA EL ERROR CS0535 ---
         public async Task<bool> RegisterAsync(string email, string password, Models.Supabase.User profileData)
         {
             return await RegisterWithRoleAsync(email, password, profileData, "turista");
@@ -65,57 +48,52 @@ namespace appTurismo.Services
         {
             try
             {
-                var response = await _supabaseClient.Auth.SignUp(email, password);
-                if (response?.User == null) return false;
+                // 1. Obtener ID del Rol vía RPC (esto es muy eficiente)
+                var resolvedRoleIdStr = await _supabaseClient.Rpc<string>("get_role_id_by_name", new Dictionary<string, object>
+        {
+            { "role_name", roleName.ToLower().Trim() }
+        });
 
-                var roleResponse = await _supabaseClient.From<Models.Supabase.Role>()
-                    .Where(r => r.Nombre == roleName.ToLower().Trim())
-                    .Get();
+                if (string.IsNullOrEmpty(resolvedRoleIdStr)) return false;
+                Guid resolvedRoleId = Guid.Parse(resolvedRoleIdStr);
 
-                var rol = roleResponse.Models.FirstOrDefault();
-                if (rol == null) return false;
+                // 2. Empaquetar datos en metadatos (Esto es lo que hace que tu Trigger funcione)
+                var options = new Supabase.Gotrue.SignUpOptions
+                {
+                    Data = new Dictionary<string, object>
+            {
+                { "nombre", profileData.Nombre },
+                { "apellido_paterno", profileData.Apellido_paterno },
+                { "apellido_materno", profileData.Apellido_materno },
+                { "telefono", profileData.Telefono },
+                { "id_rol", resolvedRoleId }
+            }
+                };
 
-                profileData.Id_usuario = Guid.Parse(response.User.Id);
-                profileData.Correo_electronico = email;
-                profileData.Id_rol = rol.Id_rol;
-                profileData.Created_at = DateTime.UtcNow;
+                // 3. Registro. ¡YA NO HAGAS .Insert() MANUAL! 
+                // El trigger en la base de datos creará la fila por ti.
+                var response = await _supabaseClient.Auth.SignUp(email, password, options);
 
-                await _supabaseClient.From<Models.Supabase.User>().Insert(profileData);
-                return true;
+                return response?.User != null;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[ERROR DE REGISTRO DETALLADO]: {ex.Message}");
-                Debug.WriteLine($"[TIPO DE ERROR]: {ex.GetType().Name}");
+                Debug.WriteLine($"[ERROR REGISTRO]: {ex.Message}");
                 return false;
             }
         }
 
-        public async Task<List<UserDTO>> GetUsersAsync()
-        {
-            // Nota: Si necesitas GetUsersAsync, tendrías que inyectar el UserMapper de nuevo.
-            // Por ahora, para evitar el error CS0103, devolvemos una lista vacía.
-            Debug.WriteLine("GetUsersAsync no implementado actualmente.");
-            return new List<UserDTO>();
-        }
+        public async Task<List<UserDTO>> GetUsersAsync() => new List<UserDTO>();
 
         public async Task CreateUserAsync(Models.Supabase.User user) =>
             await _supabaseClient.From<Models.Supabase.User>().Insert(user);
 
-        public async Task UpdateUserAsync(Models.Supabase.User user)
-        {
-            await _supabaseClient
-                .From<Models.Supabase.User>()
-                .Where(x => x.Id_usuario == user.Id_usuario)
-                .Update(user);
-        }
+        public async Task UpdateUserAsync(Models.Supabase.User user) =>
+            await _supabaseClient.From<Models.Supabase.User>().Where(x => x.Id_usuario == user.Id_usuario).Update(user);
 
         public async Task DeleteUserAsync(Guid id) =>
             await _supabaseClient.From<Models.Supabase.User>().Where(x => x.Id_usuario == id).Delete();
 
-        public async Task LogoutAsync()
-        {
-            await _supabaseClient.Auth.SignOut();
-        }
+        public async Task LogoutAsync() => await _supabaseClient.Auth.SignOut();
     }
 }

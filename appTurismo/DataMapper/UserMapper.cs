@@ -42,7 +42,7 @@ namespace appTurismo.DataMapper
 
                 UltimaActualizacion = user.Ultima_actualizacion,
 
-                CreatedAt = user.Created_at
+                CreatedAt = user.Created_at ?? DateTime.MinValue
             };
         }
     }

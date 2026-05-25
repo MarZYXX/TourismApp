@@ -29,16 +29,16 @@ namespace appTurismo
             string supabaseUrl = "https://afymvarqqnromdikgwha.supabase.co";
             string supabaseKey = "sb_publishable_ZVc1rTyPdKZWAGqTbu52DQ_TAmgGbHF";
 
-            // Configure Supabase with our custom local persistence preference mapping
             var options = new Supabase.SupabaseOptions
             {
                 AutoRefreshToken = true,
-                AutoConnectRealtime = true,
-                SessionHandler = new appTurismo.Helpers.CustomSupabaseSessionHandler()
+                AutoConnectRealtime = true
             };
 
             // Instantiate client cleanly without blocking the engine pipeline
             var supabaseClient = new Supabase.Client(supabaseUrl, supabaseKey, options);
+
+            builder.Services.AddSingleton(supabaseClient);
 
             // 2. Base Core System Registrations
             builder.Services.AddSingleton<Supabase.Client>(supabaseClient);

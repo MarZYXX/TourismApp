@@ -37,6 +37,6 @@ namespace appTurismo.Models.Supabase
         public DateTime? Ultima_actualizacion { get; set; }
 
         [Column("created_at")]
-        public DateTime Created_at { get; set; }
+        public DateTime? Created_at { get; set; }
     }
 }

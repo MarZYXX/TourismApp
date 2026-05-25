@@ -63,26 +63,34 @@ namespace appTurismo.ViewModels
 
             IsBusy = true;
 
+            // Preparamos el modelo
             var nuevoUsuario = new Models.Supabase.User
             {
                 Nombre = Nombre,
                 Apellido_paterno = ApellidoPaterno,
                 Apellido_materno = ApellidoMaterno,
-                Telefono = Telefono
+                Telefono = Telefono,
+                Correo_electronico = Email
             };
 
-            // Sends down authentication credentials alongside targeted profile information and selection variables
+            // Llamamos al servicio con la lógica de tu compañero
             bool success = await _userService.RegisterWithRoleAsync(Email, Password, nuevoUsuario, SelectedRole);
             IsBusy = false;
 
             if (success)
             {
-                await Shell.Current.DisplayAlert("Éxito", "Usuario registrado con éxito. Confirma tu correo para ingresar.", "OK");
+                // ÉXITO: Dependiendo de tu lógica, puedes enviarlo al Login o loguearlo automáticamente
+                await Shell.Current.DisplayAlert("¡Bienvenido!", "Registro exitoso.", "OK");
+
+                // Si quieres que el usuario entre directamente sin volver a escribir su pass:
+                // await Shell.Current.GoToAsync("//MainPage"); 
+
+                // Si prefieres que se loguee manualmente:
                 await Shell.Current.GoToAsync("//LoginPage");
             }
             else
             {
-                await Shell.Current.DisplayAlert("Error", "No se pudo registrar el usuario. Revisa las credenciales.", "OK");
+                await Shell.Current.DisplayAlert("Error", "No se pudo registrar. Verifica que el correo no esté en uso.", "OK");
             }
         }
 
@@ -90,6 +98,7 @@ namespace appTurismo.ViewModels
         private async Task GoToLoginAsync()
         {
             await Shell.Current.GoToAsync("//LoginPage");
+        
         }
     }
 }
