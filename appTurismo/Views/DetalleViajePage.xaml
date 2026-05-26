@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="appTurismo.Views.DetalleViajePage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"
+                               Color="#2196F3" />
+
+            <VerticalStackLayout IsVisible="{Binding TieneViaje}" Spacing="16">
+                <Label Text="{Binding Viaje.Nombre}"
+                       FontSize="27"
+                       FontAttributes="Bold"
+                       TextColor="#1B5E20" />
+
+                <Border Padding="15"
+                        Stroke="#C8E6C9"
+                        StrokeThickness="1"
+                        BackgroundColor="#F1F8E9">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="10" ColumnSpacing="12">
+                        <Label Grid.Row="0" Text="Estado:" FontAttributes="Bold" />
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Viaje.Estado}" TextColor="#1565C0" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Text="Inicio:" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Viaje.FechaInicio, StringFormat='{0:dd/MM/yyyy HH:mm}'}" />
+                        <Label Grid.Row="2" Text="Encuentro:" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Viaje.PuntoEncuentro}" />
+                        <Label Grid.Row="3" Text="Cupo:" FontAttributes="Bold" />
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Viaje.CupoMaximo}" />
+                    </Grid>
+                </Border>
+
+                <Label Text="Descripción" FontSize="20" FontAttributes="Bold" />
+                <Label Text="{Binding Viaje.Descripcion}"
+                       TextColor="#555555" />
+
+                <Label Text="Ruta" FontSize="20" FontAttributes="Bold" />
+
+                <Button Text="Abrir ruta y checkpoints"
+                        Command="{Binding VerMapaCommand}"
+                        BackgroundColor="#FF9800"
+                        TextColor="White" />
+
+                <Label Text="Participantes"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       Margin="0,10,0,0" />
+
+                <Border Padding="16"
+                        Stroke="#DADCE0"
+                        StrokeThickness="1"
+                        BackgroundColor="#FAFAFA">
+                    <VerticalStackLayout Spacing="12">
+                        <VerticalStackLayout IsVisible="{Binding PuedeAdministrarParticipantes}" Spacing="8">
+                            <Label Text="Asignar turista"
+                                   FontAttributes="Bold"
+                                   TextColor="#333333" />
+                            <Picker Title="Selecciona un turista por correo"
+                                    ItemsSource="{Binding TuristasDisponibles}"
+                                    SelectedItem="{Binding TuristaSeleccionado}"
+                                    ItemDisplayBinding="{Binding Correo_electronico}" />
+                            <Button Text="Agregar participante"
+                                    Command="{Binding AgregarParticipanteCommand}"
+                                    BackgroundColor="#2196F3"
+                                    TextColor="White" />
+                        </VerticalStackLayout>
+
+                        <Label Text="La lista solo puede modificarse mientras el viaje se encuentre en estado Plan."
+                               IsVisible="{Binding PuedeAdministrarParticipantes}"
+                               FontSize="12"
+                               TextColor="#666666" />
+
+                        <CollectionView ItemsSource="{Binding Participantes}"
+                                        SelectionMode="None"
+                                        MaximumHeightRequest="280">
+                            <CollectionView.EmptyView>
+                                <Label Text="No hay turistas asignados a este recorrido."
+                                       TextColor="#666666"
+                                       Padding="0,8" />
+                            </CollectionView.EmptyView>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="10"
+                                            Margin="0,4"
+                                            Stroke="#E0E0E0"
+                                            StrokeThickness="1"
+                                            BackgroundColor="White">
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                                <HorizontalStackLayout Spacing="4">
+                                                    <Label Text="{Binding Nombre}" FontAttributes="Bold" />
+                                                    <Label Text="{Binding Apellido_paterno}" FontAttributes="Bold" />
+                                                </HorizontalStackLayout>
+                                                <Label Text="{Binding Correo_electronico}"
+                                                       FontSize="12"
+                                                       TextColor="#666666" />
+                                            </VerticalStackLayout>
+                                            <Button Grid.Column="1"
+                                                    Text="Quitar"
+                                                    IsVisible="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PuedeAdministrarParticipantes}"
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.QuitarParticipanteCommand}"
+                                                    CommandParameter="{Binding .}"
+                                                    BackgroundColor="#E53935"
+                                                    TextColor="White"
+                                                    HeightRequest="38" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button Text="Iniciar recorrido (proximamente)"
+                        IsEnabled="False"
+                        BackgroundColor="#E0E0E0"
+                        TextColor="#777777"
+                        Margin="0,12,0,0" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -14,6 +14,7 @@ namespace appTurismo.ViewModels
         public ObservableCollection<Checkpoint> ListaCheckpoints { get; set; }
 
         public ICommand MarcarCompletadoCommand { get; }
+        public event System.Action? CheckpointsActualizados;
 
         public GestionarCheckpointsViewModel(Supabase.Client supabaseClient)
         {
@@ -45,6 +46,8 @@ namespace appTurismo.ViewModels
                 {
                     ListaCheckpoints.Add(checkpoint);
                 }
+
+                CheckpointsActualizados?.Invoke();
             }
             catch (System.Exception ex)
             {

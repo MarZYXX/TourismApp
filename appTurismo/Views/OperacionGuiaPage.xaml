@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="appTurismo.Views.OperacionGuiaPage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Label Text="Operación del Recorrido"
+                   FontSize="24"
+                   FontAttributes="Bold" />
+
+            <Label Text="Este apartado concentrará el seguimiento de los viajes activos del guía."
+                   FontSize="15"
+                   TextColor="#555555" />
+
+            <Border Padding="16"
+                    Stroke="#2196F3"
+                    StrokeThickness="1"
+                    BackgroundColor="#E3F2FD">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Siguiente avance"
+                           FontAttributes="Bold"
+                           FontSize="17"
+                           TextColor="#1565C0" />
+                    <Label Text="• Recorridos activos del día&#10;• Progreso de checkpoints&#10;• Asistencia de participantes&#10;• Alertas y SOS"
+                           FontSize="15" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

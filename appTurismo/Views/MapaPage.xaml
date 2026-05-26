@@ -3,12 +3,76 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
              x:Class="appTurismo.Views.MapaPage"
-             Title="Mapa de la Ruta">
+             Title="Ruta y checkpoints">
 
-    <Grid>
-        <mapsui:MapView x:Name="mapView" 
-                        VerticalOptions="FillAndExpand" 
-                        HorizontalOptions="FillAndExpand" />
+    <Grid RowDefinitions="*,Auto">
+        <mapsui:MapView x:Name="mapView"
+                        Grid.Row="0" />
+
+        <Border Grid.Row="1"
+                BackgroundColor="White"
+                Stroke="#E0E0E0"
+                StrokeThickness="1"
+                Padding="12">
+            <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Checkpoints del recorrido"
+                           FontSize="18"
+                           FontAttributes="Bold" />
+                    <ActivityIndicator Grid.Column="1"
+                                       IsVisible="{Binding IsBusy}"
+                                       IsRunning="{Binding IsBusy}"
+                                       Color="#2196F3" />
+                </Grid>
+
+                <CollectionView ItemsSource="{Binding ListaCheckpoints}"
+                                HeightRequest="210"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="No hay checkpoints registrados."
+                               TextColor="#666666"
+                               Padding="0,8" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,3"
+                                    Padding="10"
+                                    Stroke="#E0E0E0"
+                                    StrokeThickness="1"
+                                    BackgroundColor="#FAFAFA">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                    <VerticalStackLayout>
+                                        <Label Text="{Binding Nombre}" FontAttributes="Bold" />
+                                        <Label Text="Pendiente" FontSize="12" TextColor="#E53935">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding Completado}" Value="True">
+                                                    <Setter Property="Text" Value="Completado" />
+                                                    <Setter Property="TextColor" Value="#43A047" />
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="1"
+                                            Text="Marcar"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarcarCompletadoCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#4CAF50"
+                                            TextColor="White"
+                                            HeightRequest="40">
+                                        <Button.Triggers>
+                                            <DataTrigger TargetType="Button" Binding="{Binding Completado}" Value="True">
+                                                <Setter Property="Text" Value="Listo" />
+                                                <Setter Property="IsEnabled" Value="False" />
+                                                <Setter Property="BackgroundColor" Value="#BDBDBD" />
+                                            </DataTrigger>
+                                        </Button.Triggers>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Border>
     </Grid>
-
 </ContentPage>

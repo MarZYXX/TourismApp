@@ -25,18 +25,29 @@ namespace appTurismo.Services
                 var session = await _supabaseClient.Auth.SignIn(email, password);
                 if (session?.User == null) return null;
 
-                var rol = await _supabaseClient.Rpc<string>("get_user_role", new Dictionary<string, object>
-                {
-                    { "user_uuid", Guid.Parse(session.User.Id) }
-                });
-
-                return rol?.ToLower().Trim();
+                return await GetCurrentRoleAsync();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error Login RPC: {ex.Message}");
                 return null;
             }
+        }
+
+        public async Task<string?> GetCurrentRoleAsync()
+        {
+            var userId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (!Guid.TryParse(userId, out var userUuid))
+            {
+                return null;
+            }
+
+            var rol = await _supabaseClient.Rpc<string>("get_user_role", new Dictionary<string, object>
+            {
+                { "user_uuid", userUuid }
+            });
+
+            return rol?.ToLower().Trim();
         }
 
         public async Task<bool> RegisterAsync(string email, string password, Models.Supabase.User profileData)

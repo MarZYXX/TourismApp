@@ -5,9 +5,13 @@
              x:Class="appTurismo.Views.AdminPage"
              Title="{Binding Title}">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="15">
-            <Label Text="Tus Viajes Asignados" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Mis Viajes" FontSize="24" FontAttributes="Bold" HorizontalOptions="Center" />
 
             <Button Text="+ Crear Nuevo Viaje" 
                     Command="{Binding IrCrearViajeCommand}" 
@@ -21,7 +25,7 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
                         <Frame Margin="0,8" Padding="15" CornerRadius="12" BorderColor="#4CAF50" BackgroundColor="#F9FBE7">
-                            <Grid RowDefinitions="Auto, Auto, Auto" ColumnDefinitions="*, *">
+                            <Grid RowDefinitions="Auto, Auto, Auto, Auto" ColumnDefinitions="*, *">
                                 <Label Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding Nombre}" FontSize="18" FontAttributes="Bold" TextColor="#2E7D32" />
                                 <Label Grid.Row="1" Grid.ColumnSpan="2" Text="{Binding FechaInicio, StringFormat='Inicio: {0:dd/MM/yyyy}'}" FontSize="14" TextColor="#555" Margin="0,5,0,10" />
 
@@ -34,6 +38,11 @@
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.GestionarCheckpointsCommand}"
                                         CommandParameter="{Binding .}"
                                         BackgroundColor="#4CAF50" TextColor="White" HeightRequest="40" CornerRadius="8" Margin="5,0,0,0"/>
+
+                                <Button Grid.Row="3" Grid.ColumnSpan="2" Text="Ver detalle del viaje"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerDetalleCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#2196F3" TextColor="White" HeightRequest="42" CornerRadius="8" Margin="0,10,0,0"/>
                             </Grid>
                         </Frame>
                     </DataTemplate>

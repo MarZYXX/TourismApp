@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="appTurismo.Views.PerfilGuiaPage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <VerticalStackLayout Padding="20" Spacing="14">
+        <Label Text="Mi Perfil"
+               FontSize="24"
+               FontAttributes="Bold" />
+        <Label Text="La consulta y edición de los datos del guía se incorporará después del flujo operativo de viajes."
+               FontSize="15"
+               TextColor="#555555" />
+    </VerticalStackLayout>
+</ContentPage>

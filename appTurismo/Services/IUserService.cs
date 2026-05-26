@@ -9,8 +9,8 @@ namespace appTurismo.Services
     {
         bool IsUserLoggedIn();
 
-        // ¡ESTA ES LA LÍNEA QUE CAMBIAMOS A string?!
         Task<string?> LoginAsync(string email, string password);
+        Task<string?> GetCurrentRoleAsync();
 
         Task<bool> RegisterAsync(string email, string password, Models.Supabase.User profileData);
         Task<bool> RegisterWithRoleAsync(string email, string password, Models.Supabase.User profileData, string roleName);

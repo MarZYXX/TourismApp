@@ -16,6 +16,7 @@ public partial class CrearViajePage : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _viewModel.CheckpointEliminado += AlEliminarCheckpoint;
     }
 
     protected override async void OnAppearing()
@@ -97,6 +98,19 @@ public partial class CrearViajePage : ContentPage
         _contadorPuntos++;
 
         // Un mensajito opcional para confirmar
-        DisplayAlert("Éxito", $"'{nombrePunto}' agregado a la ruta.", "OK");
+        _ = DisplayAlertAsync("Éxito", $"'{nombrePunto}' agregado a la ruta.", "OK");
+    }
+
+    private void AlEliminarCheckpoint(Checkpoint checkpoint)
+    {
+        var pin = mapView.Pins.FirstOrDefault(p =>
+            p.Position.Latitude == checkpoint.Latitud &&
+            p.Position.Longitude == checkpoint.Longitud);
+
+        if (pin != null)
+        {
+            mapView.Pins.Remove(pin);
+            mapView.Refresh();
+        }
     }
 }

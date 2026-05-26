@@ -53,8 +53,7 @@ namespace appTurismo.ViewModels
             {
                 if (userRole == "guia")
                 {
-                    // Te manda al panel que ya tenemos terminado
-                    await Shell.Current.GoToAsync("//AdminPage");
+                    await Shell.Current.GoToAsync("//GuiaTabs/AdminPage");
                 }
                 else if (userRole == "turista")
                 {

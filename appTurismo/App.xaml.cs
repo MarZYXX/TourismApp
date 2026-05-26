@@ -5,11 +5,13 @@ namespace appTurismo
     public partial class App : Application
     {
         private readonly Supabase.Client _supabaseClient;
+        private readonly Services.IUserService _userService;
 
-        public App(Supabase.Client supabaseClient)
+        public App(Supabase.Client supabaseClient, Services.IUserService userService)
         {
             InitializeComponent();
             _supabaseClient = supabaseClient;
+            _userService = userService;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
@@ -26,11 +28,17 @@ namespace appTurismo
                 // Safely handle initialization in a non-blocking background routine
                 await _supabaseClient.InitializeAsync();
 
-                // If our CustomSupabaseSessionHandler successfully loaded a cached valid token
                 if (_supabaseClient.Auth.CurrentSession != null)
                 {
-                    // Leapfrog the login view directly into the MainPage structure
-                    await Shell.Current.GoToAsync("//MainPage");
+                    var userRole = await _userService.GetCurrentRoleAsync();
+                    if (userRole == "guia")
+                    {
+                        await Shell.Current.GoToAsync("//GuiaTabs/AdminPage");
+                    }
+                    else if (userRole == "turista")
+                    {
+                        await Shell.Current.GoToAsync("//UserPage");
+                    }
                 }
             }
             catch (Exception ex)

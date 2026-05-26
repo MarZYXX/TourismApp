@@ -16,10 +16,22 @@
         ContentTemplate="{DataTemplate views:RegisterPage}" 
         Shell.NavBarIsVisible="False" />
 
-    <ShellContent
-        Route="AdminPage"
-        ContentTemplate="{DataTemplate views:AdminPage}" 
-        Shell.NavBarIsVisible="False" />
+    <TabBar Route="GuiaTabs">
+        <ShellContent
+            Title="Mis Viajes"
+            Route="AdminPage"
+            ContentTemplate="{DataTemplate views:AdminPage}" />
+
+        <ShellContent
+            Title="Operación"
+            Route="OperacionGuiaPage"
+            ContentTemplate="{DataTemplate views:OperacionGuiaPage}" />
+
+        <ShellContent
+            Title="Perfil"
+            Route="PerfilGuiaPage"
+            ContentTemplate="{DataTemplate views:PerfilGuiaPage}" />
+    </TabBar>
 
     <ShellContent
         Route="UserPage"

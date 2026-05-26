@@ -5,22 +5,128 @@
              x:Class="appTurismo.Views.CrearViajePage"
              Title="Crear y Trazar Viaje">
 
-    <Grid RowDefinitions="Auto, Auto, *, Auto" Padding="15" RowSpacing="10">
-        <Entry Grid.Row="0" Placeholder="Nombre del Viaje (Ej. Ruta Volcán)" Text="{Binding NombrePaquete}" FontSize="18" FontAttributes="Bold" />
-        <Label Grid.Row="1" Text="Mueve el mapa al lugar deseado y presiona 'Agregar':" FontSize="14" TextColor="#555" />
+    <Grid>
+        <ScrollView IsVisible="{Binding IsEditingDetails}">
+            <VerticalStackLayout Padding="15" Spacing="14">
+                <Label Text="Información general" FontSize="21" FontAttributes="Bold" />
+                <Entry Placeholder="Nombre del viaje (Ej. Ruta Volcan)"
+                       Text="{Binding NombrePaquete}"
+                       FontSize="18"
+                       FontAttributes="Bold" />
+                <Editor Placeholder="Descripción e indicaciones para los participantes"
+                        Text="{Binding Descripcion}"
+                        HeightRequest="80"
+                        AutoSize="TextChanges" />
+                <Entry Placeholder="Punto de encuentro (Ej. Entrada principal)"
+                       Text="{Binding PuntoEncuentro}" />
+                <Entry Placeholder="Cupo máximo"
+                       Text="{Binding CupoMaximo}"
+                       Keyboard="Numeric" />
 
-        <Grid Grid.Row="2" IsClippedToBounds="True">
+                <Label Text="Programación" FontSize="21" FontAttributes="Bold" Margin="0,8,0,0" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <Label Text="Fecha de inicio" FontSize="13" TextColor="#555555" />
+                        <DatePicker Date="{Binding FechaInicio}" MinimumDate="{Binding FechaMinima}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="Hora de inicio" FontSize="13" TextColor="#555555" />
+                        <TimePicker Time="{Binding HoraInicio}" />
+                    </VerticalStackLayout>
+                </Grid>
 
-            <mapsui:MapView x:Name="mapView" VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" />
+                <Label Text="Ruta y checkpoints" FontSize="21" FontAttributes="Bold" Margin="0,8,0,0" />
+                <Label Text="Traza la ruta en un mapa amplio y revisa los puntos antes de guardar."
+                       FontSize="14"
+                       TextColor="#555555" />
+                <Button Text="Abrir trazador de ruta"
+                        Command="{Binding AbrirTrazadorCommand}"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        HeightRequest="48" />
 
-            <Label Text="📍" FontSize="45" HorizontalOptions="Center" VerticalOptions="Center" TranslationY="-20" InputTransparent="True" />
+                <Label Text="Puntos agregados" FontSize="18" FontAttributes="Bold" />
+                <CollectionView ItemsSource="{Binding CheckpointsNuevos}"
+                                MaximumHeightRequest="280"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Aún no has agregado checkpoints." TextColor="#666666" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="10" Margin="0,4" Stroke="#E0E0E0" StrokeThickness="1">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <Entry Grid.Column="0"
+                                           Text="{Binding Nombre}"
+                                           Placeholder="Nombre del checkpoint" />
+                                    <Button Grid.Column="1"
+                                            Text="Quitar"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EliminarCheckpointCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#E53935"
+                                            TextColor="White" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-            <Button Text="➕ Agregar Checkpoint Aquí" 
-                    Clicked="BtnAgregarCentro_Clicked"
-                    HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,20"
-                    BackgroundColor="#2196F3" TextColor="White" CornerRadius="20" HeightRequest="45" Padding="20,0" FontAttributes="Bold"/>
+                <Button Text="Guardar viaje en planificación"
+                        Command="{Binding GuardarViajeCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        HeightRequest="52"
+                        CornerRadius="8"
+                        Margin="0,10,0,15" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding IsTracingRoute}" RowDefinitions="Auto,*,Auto" BackgroundColor="White">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Padding="12,8">
+                <Button Text="Volver"
+                        Command="{Binding CerrarTrazadorCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#1565C0" />
+                <Label Grid.Column="1"
+                       Text="Trazar ruta"
+                       FontSize="21"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       Margin="12,0,0,0" />
+            </Grid>
+
+            <Grid Grid.Row="1" IsClippedToBounds="True">
+                <mapsui:MapView x:Name="mapView" />
+                <Label Text="📍"
+                       FontSize="42"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TranslationY="-20"
+                       InputTransparent="True" />
+                <Button Text="Agregar checkpoint aquí"
+                        Clicked="BtnAgregarCentro_Clicked"
+                        HorizontalOptions="Center"
+                        VerticalOptions="End"
+                        Margin="0,0,0,20"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        CornerRadius="20"
+                        HeightRequest="48"
+                        Padding="22,0"
+                        FontAttributes="Bold" />
+            </Grid>
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Padding="12" BackgroundColor="White">
+                <Label Text="{Binding CheckpointsNuevos.Count, StringFormat='Puntos agregados: {0}'}"
+                       VerticalOptions="Center"
+                       FontAttributes="Bold" />
+                <Button Grid.Column="1"
+                        Text="Revisar puntos"
+                        Command="{Binding CerrarTrazadorCommand}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White" />
+            </Grid>
         </Grid>
-
-        <Button Grid.Row="3" Text="💾 Guardar Viaje Completo" Command="{Binding GuardarViajeCommand}" BackgroundColor="#4CAF50" TextColor="White" HeightRequest="50" CornerRadius="8"/>
     </Grid>
 </ContentPage>

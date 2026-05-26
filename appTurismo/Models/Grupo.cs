@@ -12,18 +12,27 @@ namespace appTurismo.Models
         public string IdTourGroup { get; set; }
 
         [Column("nombre")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
 
         [Column("id_paquete")]
-        public string IdPaquete { get; set; }
+        public string? IdPaquete { get; set; }
 
         [Column("guia_id")]
-        public string GuiaId { get; set; }
+        public string GuiaId { get; set; } = string.Empty;
 
         [Column("estado")]
-        public string Estado { get; set; }
+        public string Estado { get; set; } = string.Empty;
 
         [Column("fecha_inicio")]
         public DateTime FechaInicio { get; set; }
+
+        [Column("descripcion")]
+        public string? Descripcion { get; set; }
+
+        [Column("punto_encuentro")]
+        public string? PuntoEncuentro { get; set; }
+
+        [Column("cupo_maximo")]
+        public int? CupoMaximo { get; set; }
     }
 }

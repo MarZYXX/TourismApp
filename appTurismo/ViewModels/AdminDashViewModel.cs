@@ -7,7 +7,7 @@ using appTurismo.Services;
 namespace appTurismo.ViewModels
 {
     // Heredamos de BaseViewModel que ya existe en tu proyecto
-    public class AdminDashViewModel : BaseViewModel
+    public class AdminDashViewModel : GuiaBaseViewModel
     {
         private readonly IViajeService _viajeService;
 
@@ -17,11 +17,13 @@ namespace appTurismo.ViewModels
 
         public ICommand IrCrearViajeCommand { get; }
 
+        public ICommand VerDetalleCommand { get; }
+
         public ICommand VerMapaCommand { get; }
 
         public ICommand GestionarCheckpointsCommand { get; }
 
-        public AdminDashViewModel(IViajeService viajeService)
+        public AdminDashViewModel(IViajeService viajeService, IUserService userService) : base(userService)
         {
             _viajeService = viajeService;
             Title = "Panel de Guía";
@@ -30,6 +32,12 @@ namespace appTurismo.ViewModels
             CargarDashboardCommand = new Command(async () => await CargarDashboard());
 
             IrCrearViajeCommand = new Command(async () => await Shell.Current.GoToAsync("CrearViajePage"));
+
+            VerDetalleCommand = new Command<GrupoTour>(async (viaje) =>
+            {
+                Preferences.Set("ViajeSeleccionado", viaje.IdTourGroup);
+                await Shell.Current.GoToAsync("DetalleViajePage");
+            });
 
             VerMapaCommand = new Command<GrupoTour>(async (viaje) =>
             {
