@@ -7,9 +7,13 @@
             InitializeComponent();
 
             Routing.RegisterRoute("CrearViajePage", typeof(Views.CrearViajePage));
+            Routing.RegisterRoute("EditarViajePage", typeof(Views.EditarViajePage));
             Routing.RegisterRoute("DetalleViajePage", typeof(Views.DetalleViajePage));
             Routing.RegisterRoute("MapaPage", typeof(Views.MapaPage));
             Routing.RegisterRoute("GestionarCheckpointsPage", typeof(Views.GestionarCheckpointsPage));
+            Routing.RegisterRoute("AsistenciaCheckpointPage", typeof(Views.AsistenciaCheckpointPage));
+            Routing.RegisterRoute("RegistrarIncidenciaPage", typeof(Views.RegistrarIncidenciaPage));
+            Routing.RegisterRoute("DetalleIncidenciaPage", typeof(Views.DetalleIncidenciaPage));
         }
     }
 }

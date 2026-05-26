@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="appTurismo.Views.AsistenciaCheckpointPage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*" Padding="18" RowSpacing="14">
+        <VerticalStackLayout Grid.Row="0" Spacing="10">
+            <Label Text="Pase de lista"
+                   FontSize="25"
+                   FontAttributes="Bold" />
+            <Label Text="{Binding NombreCheckpoint}"
+                   FontSize="18"
+                   TextColor="#1565C0"
+                   FontAttributes="Bold" />
+
+            <Border Padding="12"
+                    Stroke="#A5D6A7"
+                    StrokeThickness="1"
+                    BackgroundColor="#E8F5E9">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="{Binding Resumen}"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#2E7D32"
+                           VerticalOptions="Center" />
+                    <ActivityIndicator Grid.Column="1"
+                                       IsVisible="{Binding IsBusy}"
+                                       IsRunning="{Binding IsBusy}"
+                                       Color="#2E7D32" />
+                </Grid>
+            </Border>
+
+            <Label Text="Marca la presencia de los turistas en este punto del recorrido."
+                   FontSize="13"
+                   TextColor="#666666" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding Registros}"
+                        SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Border Padding="18" Stroke="#E0E0E0" StrokeThickness="1" BackgroundColor="#FAFAFA">
+                    <Label Text="Este recorrido no tiene participantes asignados."
+                           TextColor="#666666"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="12"
+                            Margin="0,0,0,10"
+                            Stroke="#E0E0E0"
+                            StrokeThickness="1"
+                            BackgroundColor="White">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Spacing="3">
+                                <Label Text="{Binding NombreCompleto}"
+                                       FontAttributes="Bold"
+                                       FontSize="16" />
+                                <Label Text="{Binding Usuario.Correo_electronico}"
+                                       TextColor="#666666"
+                                       FontSize="12" />
+                                <Label Text="Ausente"
+                                       FontSize="12"
+                                       TextColor="#E53935">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Presente}" Value="True">
+                                            <Setter Property="Text" Value="Presente" />
+                                            <Setter Property="TextColor" Value="#2E7D32" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Grid.Column="1" Spacing="6">
+                                <Button Text="Marcar presente"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CambiarPresenciaCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#2E7D32"
+                                        TextColor="White"
+                                        FontSize="12">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding Presente}" Value="True">
+                                            <Setter Property="Text" Value="Marcar ausente" />
+                                            <Setter Property="BackgroundColor" Value="#E53935" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                                <Button Text="Incidencia"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.RegistrarIncidenciaCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#F57C00"
+                                        TextColor="White"
+                                        FontSize="12" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

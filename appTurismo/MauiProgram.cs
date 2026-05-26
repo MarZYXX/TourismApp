@@ -66,12 +66,20 @@ namespace appTurismo
 
             builder.Services.AddTransient<CrearViajeViewModel>();
             builder.Services.AddTransient<CrearViajePage>();
+            builder.Services.AddTransient<EditarViajeViewModel>();
+            builder.Services.AddTransient<EditarViajePage>();
             builder.Services.AddTransient<DetalleViajeViewModel>();
             builder.Services.AddTransient<DetalleViajePage>();
             builder.Services.AddTransient<MapaPage>();
 
             builder.Services.AddTransient<GestionarCheckpointsViewModel>();
             builder.Services.AddTransient<GestionarCheckpointsPage>();
+            builder.Services.AddTransient<AsistenciaCheckpointViewModel>();
+            builder.Services.AddTransient<AsistenciaCheckpointPage>();
+            builder.Services.AddTransient<RegistrarIncidenciaViewModel>();
+            builder.Services.AddTransient<RegistrarIncidenciaPage>();
+            builder.Services.AddTransient<DetalleIncidenciaViewModel>();
+            builder.Services.AddTransient<DetalleIncidenciaPage>();
 
             return builder.Build();
         }

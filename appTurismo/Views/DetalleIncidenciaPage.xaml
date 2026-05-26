@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="appTurismo.Views.DetalleIncidenciaPage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Label Text="Detalle de incidencia"
+                   FontSize="27"
+                   FontAttributes="Bold" />
+
+            <Border Padding="14"
+                    Stroke="#FFE082"
+                    StrokeThickness="1"
+                    BackgroundColor="#FFF8E1"
+                    IsVisible="{Binding TieneIncidencia}">
+                <VerticalStackLayout Spacing="7">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding Incidencia.TipoVisible}"
+                               FontSize="20"
+                               FontAttributes="Bold"
+                               TextColor="#E65100" />
+                        <Label Grid.Column="1"
+                               Text="{Binding Incidencia.EstadoVisible}"
+                               FontAttributes="Bold"
+                               TextColor="#F57C00" />
+                    </Grid>
+                    <Label Text="Requiere atencion prioritaria"
+                           IsVisible="{Binding Incidencia.EsPrioritaria}"
+                           FontAttributes="Bold"
+                           TextColor="#C62828" />
+                    <Label Text="{Binding Incidencia.NombreTurista, StringFormat='Turista: {0}'}" />
+                    <Label Text="{Binding Incidencia.NombreViaje, StringFormat='Viaje: {0}'}" />
+                    <Label Text="{Binding Incidencia.NombreCheckpoint, StringFormat='Checkpoint: {0}'}" />
+                    <Label Text="{Binding Incidencia.FechaVisible, StringFormat='Registrada: {0}'}"
+                           TextColor="#666666" />
+                </VerticalStackLayout>
+            </Border>
+
+            <VerticalStackLayout Spacing="6">
+                <Label Text="Descripcion reportada"
+                       FontAttributes="Bold" />
+                <Label Text="{Binding Incidencia.Incidencia.Descripcion, TargetNullValue='Sin descripcion adicional.'}"
+                       TextColor="#555555" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="6">
+                <Label Text="Nota de atencion o resolucion"
+                       FontAttributes="Bold" />
+                <Editor Text="{Binding NotaResolucion}"
+                        Placeholder="Ejemplo: Se acompano al turista al punto de encuentro."
+                        AutoSize="TextChanges"
+                        MinimumHeightRequest="100"
+                        IsEnabled="{Binding PuedeCerrar}" />
+            </VerticalStackLayout>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10"
+                  IsVisible="{Binding PuedeCerrar}">
+                <Button Text="Marcar atendida"
+                        Command="{Binding MarcarAtendidaCommand}"
+                        IsVisible="{Binding PuedeAtender}"
+                        BackgroundColor="#2196F3"
+                        TextColor="White" />
+                <Button Grid.Column="1"
+                        Text="Cerrar caso"
+                        Command="{Binding CerrarIncidenciaCommand}"
+                        BackgroundColor="#F57C00"
+                        TextColor="White" />
+            </Grid>
+
+            <Border Padding="12"
+                    Stroke="#C8E6C9"
+                    BackgroundColor="#F1F8E9"
+                    IsVisible="{Binding Incidencia.EsCerrada}">
+                <Label Text="Esta incidencia fue cerrada y se conserva en el historial."
+                       TextColor="#2E7D32" />
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -8,12 +8,136 @@
         <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
     </ContentPage.ToolbarItems>
 
-    <VerticalStackLayout Padding="20" Spacing="14">
-        <Label Text="Mi Perfil"
-               FontSize="24"
-               FontAttributes="Bold" />
-        <Label Text="La consulta y edición de los datos del guía se incorporará después del flujo operativo de viajes."
-               FontSize="15"
-               TextColor="#555555" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout>
+                    <Label Text="Mi Perfil"
+                           FontSize="26"
+                           FontAttributes="Bold" />
+                    <Label Text="Datos personales y actividad de tus recorridos."
+                           TextColor="#555555" />
+                </VerticalStackLayout>
+                <ActivityIndicator Grid.Column="1"
+                                   IsVisible="{Binding IsBusy}"
+                                   IsRunning="{Binding IsBusy}"
+                                   Color="#2196F3"
+                                   VerticalOptions="Center" />
+            </Grid>
+
+            <Border Padding="16"
+                    Stroke="#BBDEFB"
+                    StrokeThickness="1"
+                    BackgroundColor="#E3F2FD"
+                    IsVisible="{Binding TienePerfil}">
+                <VerticalStackLayout Spacing="7">
+                    <Label Text="{Binding NombreCompleto}"
+                           FontSize="22"
+                           FontAttributes="Bold"
+                           TextColor="#0D47A1" />
+                    <Label Text="{Binding Perfil.Correo_electronico}"
+                           TextColor="#555555" />
+                    <Border Padding="8,4"
+                            Stroke="#90CAF9"
+                            StrokeThickness="1"
+                            BackgroundColor="White"
+                            HorizontalOptions="Start">
+                        <Label Text="{Binding RolVisible}"
+                               FontAttributes="Bold"
+                               TextColor="#1565C0" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <VerticalStackLayout IsVisible="{Binding EstaConsultando}" Spacing="12">
+                <Label Text="Datos del guia"
+                       FontSize="20"
+                       FontAttributes="Bold" />
+                <Border Padding="14" Stroke="#E0E0E0" StrokeThickness="1">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="10" ColumnSpacing="12">
+                        <Label Text="Nombre:" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="{Binding Perfil.Nombre}" />
+                        <Label Grid.Row="1" Text="Apellidos:" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Grid.Column="1">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="{Binding Perfil.Apellido_paterno}" />
+                                    <Span Text=" " />
+                                    <Span Text="{Binding Perfil.Apellido_materno}" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label Grid.Row="2" Text="Telefono:" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Perfil.Telefono, TargetNullValue='Sin telefono registrado'}" />
+                        <Label Grid.Row="3" Text="Correo:" FontAttributes="Bold" />
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Perfil.Correo_electronico}" />
+                    </Grid>
+                </Border>
+                <Button Text="Editar datos personales"
+                        Command="{Binding EditarPerfilCommand}"
+                        BackgroundColor="#2196F3"
+                        TextColor="White" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout IsVisible="{Binding EstaEditando}" Spacing="10">
+                <Label Text="Editar datos personales"
+                       FontSize="20"
+                       FontAttributes="Bold" />
+                <Entry Placeholder="Nombre" Text="{Binding Nombre}" />
+                <Entry Placeholder="Apellido paterno" Text="{Binding ApellidoPaterno}" />
+                <Entry Placeholder="Apellido materno" Text="{Binding ApellidoMaterno}" />
+                <Entry Placeholder="Telefono" Text="{Binding Telefono}" Keyboard="Telephone" />
+                <Label Text="El correo y el rol son datos de acceso y no se modifican aqui."
+                       FontSize="12"
+                       TextColor="#666666" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Button Text="Cancelar"
+                            Command="{Binding CancelarEdicionCommand}"
+                            BackgroundColor="#757575"
+                            TextColor="White" />
+                    <Button Grid.Column="1"
+                            Text="Guardar"
+                            Command="{Binding GuardarPerfilCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="#4CAF50"
+                            TextColor="White" />
+                </Grid>
+            </VerticalStackLayout>
+
+            <Label Text="Resumen de mis viajes"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   Margin="0,8,0,0" />
+            <Label Text="{Binding TotalViajes, StringFormat='Tienes {0} viajes registrados como guia.'}"
+                   TextColor="#555555" />
+
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="8">
+                <Border Padding="12" BackgroundColor="#FFF8E1" Stroke="#FFE082" StrokeThickness="1">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding ViajesPlanificados}" FontSize="23" FontAttributes="Bold" TextColor="#F57C00" />
+                        <Label Text="Planificados" TextColor="#555555" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" Padding="12" BackgroundColor="#E3F2FD" Stroke="#90CAF9" StrokeThickness="1">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding ViajesEnCurso}" FontSize="23" FontAttributes="Bold" TextColor="#1565C0" />
+                        <Label Text="En curso" TextColor="#555555" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Padding="12" BackgroundColor="#E8F5E9" Stroke="#A5D6A7" StrokeThickness="1">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding ViajesFinalizados}" FontSize="23" FontAttributes="Bold" TextColor="#2E7D32" />
+                        <Label Text="Finalizados" TextColor="#555555" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Padding="12" BackgroundColor="#F5F5F5" Stroke="#BDBDBD" StrokeThickness="1">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding ViajesCancelados}" FontSize="23" FontAttributes="Bold" TextColor="#616161" />
+                        <Label Text="Cancelados" TextColor="#555555" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

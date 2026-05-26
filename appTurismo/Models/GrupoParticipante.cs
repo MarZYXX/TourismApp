@@ -14,5 +14,8 @@ namespace appTurismo.Models
 
         [Column("joined_at")]
         public DateTime? JoinedAt { get; set; }
+
+        [Column("estado")]
+        public string Estado { get; set; } = "Activo";
     }
 }

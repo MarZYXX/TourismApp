@@ -14,5 +14,8 @@ namespace appTurismo.Models
         public string? Descripcion { get; set; }
         public string? PuntoEncuentro { get; set; }
         public int? CupoMaximo { get; set; }
+
+        public bool EsPlanificado => string.Equals(Estado, "Plan", StringComparison.OrdinalIgnoreCase);
+        public bool EsCancelado => string.Equals(Estado, "Cancelado", StringComparison.OrdinalIgnoreCase);
     }
 }

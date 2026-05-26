@@ -50,6 +50,41 @@ namespace appTurismo.Services
             return rol?.ToLower().Trim();
         }
 
+        public async Task<Models.Supabase.User?> GetCurrentUserProfileAsync()
+        {
+            var userId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (!Guid.TryParse(userId, out var userUuid))
+            {
+                return null;
+            }
+
+            var respuesta = await _supabaseClient.From<Models.Supabase.User>()
+                                                .Where(u => u.Id_usuario == userUuid)
+                                                .Get();
+            return respuesta.Models.FirstOrDefault();
+        }
+
+        public async Task UpdateCurrentUserProfileAsync(
+            string nombre,
+            string apellidoPaterno,
+            string apellidoMaterno,
+            string telefono)
+        {
+            var userId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (!Guid.TryParse(userId, out var userUuid))
+            {
+                throw new InvalidOperationException("No hay un usuario autenticado.");
+            }
+
+            await _supabaseClient.From<Models.Supabase.User>()
+                                 .Where(u => u.Id_usuario == userUuid)
+                                 .Set(u => u.Nombre, nombre)
+                                 .Set(u => u.Apellido_paterno, apellidoPaterno)
+                                 .Set(u => u.Apellido_materno, apellidoMaterno)
+                                 .Set(u => u.Telefono, telefono)
+                                 .Update();
+        }
+
         public async Task<bool> RegisterAsync(string email, string password, Models.Supabase.User profileData)
         {
             return await RegisterWithRoleAsync(email, password, profileData, "turista");

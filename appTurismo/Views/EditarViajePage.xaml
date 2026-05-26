@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+             x:Class="appTurismo.Views.EditarViajePage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <Grid>
+        <ScrollView IsVisible="{Binding IsEditingDetails}">
+            <VerticalStackLayout Padding="20" Spacing="14" IsVisible="{Binding TieneViaje}">
+                <Label Text="Editar viaje planificado"
+                       FontSize="26"
+                       FontAttributes="Bold" />
+                <Label Text="Puedes ajustar la programacion y la ruta antes de iniciar el recorrido."
+                       TextColor="#555555" />
+
+                <Label Text="Informacion general" FontSize="19" FontAttributes="Bold" />
+                <Entry Placeholder="Nombre del viaje" Text="{Binding Nombre}" />
+                <Editor Placeholder="Descripcion e indicaciones"
+                        Text="{Binding Descripcion}"
+                        AutoSize="TextChanges"
+                        MinimumHeightRequest="90" />
+                <Entry Placeholder="Punto de encuentro" Text="{Binding PuntoEncuentro}" />
+                <Entry Placeholder="Cupo maximo" Text="{Binding CupoMaximo}" Keyboard="Numeric" />
+
+                <Label Text="Programacion" FontSize="19" FontAttributes="Bold" Margin="0,8,0,0" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Fecha de inicio" FontSize="13" TextColor="#555555" />
+                        <DatePicker Date="{Binding FechaInicio}" MinimumDate="{Binding FechaMinima}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label Text="Hora de inicio" FontSize="13" TextColor="#555555" />
+                        <TimePicker Time="{Binding HoraInicio}" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <Label Text="Ruta y checkpoints" FontSize="19" FontAttributes="Bold" Margin="0,8,0,0" />
+                <Label Text="Agrega, mueve, renombra o cambia el orden de visita antes de iniciar."
+                       TextColor="#555555" />
+                <Button Text="Agregar checkpoint en mapa"
+                        Command="{Binding AbrirTrazadorCommand}"
+                        BackgroundColor="#2196F3"
+                        TextColor="White" />
+
+                <CollectionView ItemsSource="{Binding Checkpoints}"
+                                MaximumHeightRequest="350"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="La ruta debe conservar al menos un checkpoint."
+                               TextColor="#C62828" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="9" Margin="0,4" Stroke="#E0E0E0" StrokeThickness="1">
+                                <VerticalStackLayout Spacing="7">
+                                    <Entry Text="{Binding Nombre}"
+                                           Placeholder="Nombre del checkpoint"
+                                           FontAttributes="Bold" />
+                                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="5">
+                                        <Button Text="Mover"
+                                                FontSize="12"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MoverCheckpointCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#FF9800"
+                                                TextColor="White" />
+                                        <Button Grid.Column="1"
+                                                Text="Subir"
+                                                FontSize="12"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SubirCheckpointCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#607D8B"
+                                                TextColor="White" />
+                                        <Button Grid.Column="2"
+                                                Text="Bajar"
+                                                FontSize="12"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.BajarCheckpointCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#607D8B"
+                                                TextColor="White" />
+                                        <Button Grid.Column="3"
+                                                Text="Quitar"
+                                                FontSize="12"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EliminarCheckpointCommand}"
+                                                CommandParameter="{Binding .}"
+                                                BackgroundColor="#E53935"
+                                                TextColor="White" />
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Button Text="Guardar cambios"
+                        Command="{Binding GuardarCambiosCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White"
+                        HeightRequest="52"
+                        Margin="0,10,0,16" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid IsVisible="{Binding IsTracingRoute}" RowDefinitions="Auto,*,Auto" BackgroundColor="White">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Padding="12,8">
+                <Button Text="Volver"
+                        Command="{Binding CerrarTrazadorCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="#1565C0" />
+                <Label Grid.Column="1"
+                       Text="{Binding TituloTrazador}"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       Margin="12,0,0,0" />
+            </Grid>
+
+            <Grid Grid.Row="1" IsClippedToBounds="True">
+                <mapsui:MapView x:Name="mapView" />
+                <Label Text="+"
+                       FontSize="42"
+                       TextColor="#E53935"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       TranslationY="-18"
+                       InputTransparent="True" />
+                <Button Text="{Binding AccionMapaTexto}"
+                        Clicked="AplicarPuntoMapa_Clicked"
+                        HorizontalOptions="Center"
+                        VerticalOptions="End"
+                        Margin="0,0,0,20"
+                        BackgroundColor="#2196F3"
+                        TextColor="White"
+                        CornerRadius="20"
+                        Padding="22,0"
+                        HeightRequest="48"
+                        FontAttributes="Bold" />
+            </Grid>
+
+            <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Padding="12">
+                <Label Text="{Binding Checkpoints.Count, StringFormat='Puntos: {0}'}"
+                       VerticalOptions="Center"
+                       FontAttributes="Bold" />
+                <Button Grid.Column="1"
+                        Text="Revisar lista"
+                        Command="{Binding CerrarTrazadorCommand}"
+                        BackgroundColor="#4CAF50"
+                        TextColor="White" />
+            </Grid>
+        </Grid>
+    </Grid>
+</ContentPage>

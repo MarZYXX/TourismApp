@@ -40,7 +40,7 @@
                                     Stroke="#E0E0E0"
                                     StrokeThickness="1"
                                     BackgroundColor="#FAFAFA">
-                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                                     <VerticalStackLayout>
                                         <Label Text="{Binding Nombre}" FontAttributes="Bold" />
                                         <Label Text="Pendiente" FontSize="12" TextColor="#E53935">
@@ -53,9 +53,19 @@
                                         </Label>
                                     </VerticalStackLayout>
                                     <Button Grid.Column="1"
+                                            Text="Lista"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AbrirAsistenciaCommand}"
+                                            CommandParameter="{Binding .}"
+                                            IsVisible="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EsRecorridoActivo}"
+                                            BackgroundColor="#1976D2"
+                                            TextColor="White"
+                                            FontSize="12"
+                                            HeightRequest="40" />
+                                    <Button Grid.Column="2"
                                             Text="Marcar"
                                             Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarcarCompletadoCommand}"
                                             CommandParameter="{Binding .}"
+                                            IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EsRecorridoActivo}"
                                             BackgroundColor="#4CAF50"
                                             TextColor="White"
                                             HeightRequest="40">
@@ -72,6 +82,19 @@
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
                 </CollectionView>
+
+                <Button Text="Finalizar recorrido"
+                        Command="{Binding FinalizarRecorridoCommand}"
+                        IsVisible="{Binding EsRecorridoActivo}"
+                        IsEnabled="{Binding PuedeFinalizarRecorrido}"
+                        BackgroundColor="#2E7D32"
+                        TextColor="White"
+                        HeightRequest="48" />
+                <Label Text="Marca todos los checkpoints para habilitar la finalizacion."
+                       IsVisible="{Binding EsRecorridoActivo}"
+                       FontSize="12"
+                       TextColor="#666666"
+                       HorizontalTextAlignment="Center" />
             </VerticalStackLayout>
         </Border>
     </Grid>

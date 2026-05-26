@@ -117,11 +117,14 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <Button Text="Iniciar recorrido (proximamente)"
-                        IsEnabled="False"
-                        BackgroundColor="#E0E0E0"
-                        TextColor="#777777"
+                <Button Text="Iniciar recorrido"
+                        Command="{Binding IniciarRecorridoCommand}"
+                        IsVisible="{Binding PuedeIniciarRecorrido}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        BackgroundColor="#2E7D32"
+                        TextColor="White"
                         Margin="0,12,0,0" />
+
             </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>

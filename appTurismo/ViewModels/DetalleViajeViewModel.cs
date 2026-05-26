@@ -20,12 +20,17 @@ namespace appTurismo.ViewModels
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(TieneViaje));
                 OnPropertyChanged(nameof(PuedeAdministrarParticipantes));
+                OnPropertyChanged(nameof(PuedeIniciarRecorrido));
+                OnPropertyChanged(nameof(EsRecorridoIniciado));
             }
         }
 
         public bool TieneViaje => Viaje != null;
         public bool PuedeAdministrarParticipantes =>
             string.Equals(Viaje?.Estado, "Plan", StringComparison.OrdinalIgnoreCase);
+        public bool PuedeIniciarRecorrido => PuedeAdministrarParticipantes;
+        public bool EsRecorridoIniciado =>
+            string.Equals(Viaje?.Estado, "Activo", StringComparison.OrdinalIgnoreCase);
 
         public ObservableCollection<Models.Supabase.User> Participantes { get; } = new();
         public ObservableCollection<Models.Supabase.User> TuristasDisponibles { get; } = new();
@@ -44,6 +49,7 @@ namespace appTurismo.ViewModels
         public ICommand GestionarCheckpointsCommand { get; }
         public ICommand AgregarParticipanteCommand { get; }
         public ICommand QuitarParticipanteCommand { get; }
+        public ICommand IniciarRecorridoCommand { get; }
 
         public DetalleViajeViewModel(IViajeService viajeService, IUserService userService) : base(userService)
         {
@@ -54,6 +60,7 @@ namespace appTurismo.ViewModels
             GestionarCheckpointsCommand = new Command(async () => await AbrirCheckpointsAsync());
             AgregarParticipanteCommand = new Command(async () => await AgregarParticipanteAsync());
             QuitarParticipanteCommand = new Command<Models.Supabase.User>(async turista => await QuitarParticipanteAsync(turista));
+            IniciarRecorridoCommand = new Command(async () => await IniciarRecorridoAsync());
         }
 
         public async Task CargarViajeAsync(string grupoId)
@@ -205,6 +212,40 @@ namespace appTurismo.ViewModels
             {
                 System.Diagnostics.Debug.WriteLine($"Error al quitar participante: {ex.Message}");
                 await Shell.Current.DisplayAlertAsync("No se pudo quitar", "No fue posible actualizar la lista de participantes.", "OK");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private async Task IniciarRecorridoAsync()
+        {
+            if (Viaje == null || !PuedeIniciarRecorrido) return;
+
+            var mensaje = Participantes.Count == 0
+                ? "Este viaje no tiene turistas asignados. Deseas iniciarlo de todas formas para realizar pruebas?"
+                : $"Deseas iniciar el recorrido con {Participantes.Count} participante(s)?";
+
+            var confirmar = await Shell.Current.DisplayAlertAsync(
+                "Iniciar recorrido",
+                mensaje,
+                "Iniciar",
+                "Cancelar");
+
+            if (!confirmar) return;
+
+            try
+            {
+                IsBusy = true;
+                await _viajeService.StartTripAsync(Viaje.IdTourGroup);
+                Preferences.Set("ViajeSeleccionado", Viaje.IdTourGroup);
+                await Shell.Current.GoToAsync("//GuiaTabs/OperacionGuiaPage");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error al iniciar recorrido: {ex.Message}");
+                await Shell.Current.DisplayAlertAsync("No se pudo iniciar", "No fue posible cambiar el viaje a estado Activo.", "OK");
             }
             finally
             {

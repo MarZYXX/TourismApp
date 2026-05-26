@@ -9,28 +9,171 @@
     </ContentPage.ToolbarItems>
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="16">
-            <Label Text="Operación del Recorrido"
-                   FontSize="24"
+        <VerticalStackLayout Padding="20" Spacing="18">
+            <VerticalStackLayout Spacing="6">
+                <Label Text="Recorridos en marcha"
+                       FontSize="25"
+                       FontAttributes="Bold" />
+                <Label Text="Controla la ruta y atiende situaciones durante el recorrido."
+                       FontSize="14"
+                       TextColor="#555555" />
+                <ActivityIndicator IsVisible="{Binding IsBusy}"
+                                   IsRunning="{Binding IsBusy}"
+                                   Color="#2196F3"
+                                   HorizontalOptions="Start" />
+            </VerticalStackLayout>
+
+            <Label Text="Incidencias pendientes"
+                   FontSize="19"
                    FontAttributes="Bold" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding IncidenciasPendientes}"
+                                 Spacing="8">
+                <BindableLayout.EmptyView>
+                    <Border Padding="12"
+                            Stroke="#C8E6C9"
+                            StrokeThickness="1"
+                            BackgroundColor="#F1F8E9">
+                        <Label Text="No hay incidencias pendientes de atender."
+                               TextColor="#2E7D32" />
+                    </Border>
+                </BindableLayout.EmptyView>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="10"
+                                Stroke="#FFE082"
+                                StrokeThickness="1"
+                                BackgroundColor="#FFF8E1">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <VerticalStackLayout Spacing="3">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="{Binding TipoVisible}"
+                                               FontAttributes="Bold"
+                                               TextColor="#E65100" />
+                                        <Label Grid.Column="1"
+                                               Text="{Binding EstadoVisible}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="#F57C00" />
+                                    </Grid>
+                                    <Label Text="Atencion prioritaria"
+                                           IsVisible="{Binding EsPrioritaria}"
+                                           FontAttributes="Bold"
+                                           FontSize="12"
+                                           TextColor="#C62828" />
+                                    <Label Text="{Binding NombreTurista, StringFormat='Turista: {0}'}"
+                                           FontSize="12" />
+                                    <Label Text="{Binding NombreViaje, StringFormat='Viaje: {0}'}"
+                                           FontSize="12" />
+                                    <Label Text="{Binding NombreCheckpoint, StringFormat='Checkpoint: {0}'}"
+                                           FontSize="12"
+                                           TextColor="#666666" />
+                                </VerticalStackLayout>
+                                <Button Grid.Column="1"
+                                        Text="Ver"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerIncidenciaCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#F57C00"
+                                        TextColor="White"
+                                        HeightRequest="40" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
 
-            <Label Text="Este apartado concentrará el seguimiento de los viajes activos del guía."
-                   FontSize="15"
-                   TextColor="#555555" />
+            <Label Text="Viajes activos"
+                   FontSize="19"
+                   FontAttributes="Bold"
+                   Margin="0,8,0,0" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding ViajesEnCurso}"
+                                 Spacing="12">
+                <BindableLayout.EmptyView>
+                    <Border Padding="18"
+                            Stroke="#E0E0E0"
+                            StrokeThickness="1"
+                            BackgroundColor="#FAFAFA">
+                        <Label Text="No hay recorridos activos. Inicia un viaje desde Mis Viajes."
+                               TextColor="#666666" />
+                    </Border>
+                </BindableLayout.EmptyView>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="15"
+                                Stroke="#C8E6C9"
+                                StrokeThickness="1"
+                                BackgroundColor="#F1F8E9">
+                            <VerticalStackLayout Spacing="10">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="{Binding Nombre}"
+                                           FontSize="20"
+                                           FontAttributes="Bold"
+                                           TextColor="#1B5E20" />
+                                    <Label Grid.Column="1"
+                                           Text="Activo"
+                                           FontAttributes="Bold"
+                                           TextColor="#2E7D32"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                                <Label Text="{Binding FechaInicio, StringFormat='Inicio: {0:dd/MM/yyyy HH:mm}'}" />
+                                <Label Text="{Binding PuntoEncuentro, StringFormat='Encuentro: {0}'}"
+                                       TextColor="#555555" />
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                    <Button Text="Abrir"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AbrirSeguimientoCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#FF9800"
+                                            TextColor="White" />
+                                    <Button Grid.Column="1"
+                                            Text="Detalle"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerDetalleCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#2196F3"
+                                            TextColor="White" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
 
-            <Border Padding="16"
-                    Stroke="#2196F3"
-                    StrokeThickness="1"
-                    BackgroundColor="#E3F2FD">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Siguiente avance"
-                           FontAttributes="Bold"
-                           FontSize="17"
-                           TextColor="#1565C0" />
-                    <Label Text="• Recorridos activos del día&#10;• Progreso de checkpoints&#10;• Asistencia de participantes&#10;• Alertas y SOS"
-                           FontSize="15" />
-                </VerticalStackLayout>
-            </Border>
+            <Label Text="Historial de incidencias cerradas"
+                   FontSize="19"
+                   FontAttributes="Bold"
+                   Margin="0,8,0,0" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding HistorialIncidencias}"
+                                 Spacing="8">
+                <BindableLayout.EmptyView>
+                    <Label Text="Todavia no hay incidencias cerradas."
+                           TextColor="#666666" />
+                </BindableLayout.EmptyView>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="10"
+                                Stroke="#E0E0E0"
+                                StrokeThickness="1"
+                                BackgroundColor="#FAFAFA">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="{Binding TipoVisible}"
+                                           FontAttributes="Bold"
+                                           TextColor="#555555" />
+                                    <Label Text="{Binding NombreTurista, StringFormat='Turista: {0}'}"
+                                           FontSize="12" />
+                                    <Label Text="{Binding FechaVisible, StringFormat='Registrada: {0}'}"
+                                           FontSize="12"
+                                           TextColor="#666666" />
+                                </VerticalStackLayout>
+                                <Button Grid.Column="1"
+                                        Text="Ver"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerIncidenciaCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#757575"
+                                        TextColor="White" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
