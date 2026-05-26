@@ -7,7 +7,7 @@ namespace appTurismo.Services
 {
     public interface IViajeService
     {
-        Task<List<GrupoTour>> GetGuideTripsAsync(string guiaId);
+        Task<List<GrupoTour>> GetGuideTripsAsync();
         Task CreateTripAsync(GrupoTour grupo, List<Checkpoint> puntos);
     }
 
@@ -20,20 +20,29 @@ namespace appTurismo.Services
             _supabaseClient = supabaseClient;
         }
 
-        // 1. AHORA LEEMOS LOS VIAJES REALES DE SUPABASE
-        public async Task<List<GrupoTour>> GetGuideTripsAsync(string guiaId)
+        public async Task<List<GrupoTour>> GetGuideTripsAsync()
         {
             var lista = new List<GrupoTour>();
             try
             {
-                var respuesta = await _supabaseClient.From<Grupo>().Get();
+                var guiaId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+                if (string.IsNullOrWhiteSpace(guiaId))
+                {
+                    return lista;
+                }
+
+                var respuesta = await _supabaseClient.From<Grupo>()
+                                                     .Where(g => g.GuiaId == guiaId)
+                                                     .Get();
 
                 foreach (var g in respuesta.Models)
                 {
                     lista.Add(new GrupoTour
                     {
                         IdTourGroup = g.IdTourGroup,
-                        Nombre = g.Nombre ?? "Viaje Sin Nombre", // Si es NULL, pone esto
+                        IdPaquete = g.IdPaquete,
+                        GuiaId = g.GuiaId,
+                        Nombre = g.Nombre ?? "Viaje Sin Nombre",
                         Estado = g.Estado,
                         FechaInicio = g.FechaInicio
                     });
@@ -46,47 +55,37 @@ namespace appTurismo.Services
             return lista;
         }
 
-        // 2. AHORA GUARDAMOS CON EL NOMBRE Y EL UUID CORRECTO
         public async Task CreateTripAsync(GrupoTour grupo, List<Checkpoint> puntos)
         {
-            try
+            var guiaId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (string.IsNullOrWhiteSpace(guiaId))
             {
-                var nuevoGrupoSupabase = new Grupo
-                {
-                    IdTourGroup = grupo.IdTourGroup, // Como pusimos 'true', Supabase respetará este ID
-                    Nombre = grupo.Nombre,
-                    Estado = "Activo",
-                    FechaInicio = grupo.FechaInicio
-                };
-
-                // 1. Guardamos el Grupo
-                await _supabaseClient.From<Grupo>().Insert(nuevoGrupoSupabase);
-
-                // 2. Guardamos los Checkpoints vinculados a ese MISMO ID
-                if (puntos != null && puntos.Count > 0)
-                {
-                    int orden = 1;
-                    foreach (var p in puntos)
-                    {
-                        p.IdCheckpoint = Guid.NewGuid().ToString(); // Generamos el ID del punto
-                        p.IdGrupo = grupo.IdTourGroup;              // Lo enlazamos fuertemente al Grupo
-                        p.Orden = orden;
-
-                        try
-                        {
-                            await _supabaseClient.From<Checkpoint>().Insert(p);
-                        }
-                        catch (Exception exPunto)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"[ERROR PUNTO]: {exPunto.Message}");
-                        }
-                        orden++;
-                    }
-                }
+                throw new InvalidOperationException("No hay un guía autenticado para crear el viaje.");
             }
-            catch (Exception ex)
+
+            var nuevoGrupoSupabase = new Grupo
             {
-                System.Diagnostics.Debug.WriteLine($"[ERROR GRUPO]: {ex.Message}");
+                IdTourGroup = grupo.IdTourGroup,
+                Nombre = grupo.Nombre,
+                GuiaId = guiaId,
+                Estado = "Activo",
+                FechaInicio = grupo.FechaInicio
+            };
+
+            await _supabaseClient.From<Grupo>().Insert(nuevoGrupoSupabase);
+
+            if (puntos != null && puntos.Count > 0)
+            {
+                int orden = 1;
+                foreach (var p in puntos)
+                {
+                    p.IdCheckpoint = Guid.NewGuid().ToString();
+                    p.IdGrupo = grupo.IdTourGroup;
+                    p.Orden = orden;
+
+                    await _supabaseClient.From<Checkpoint>().Insert(p);
+                    orden++;
+                }
             }
         }
     }

@@ -49,7 +49,7 @@ namespace appTurismo.ViewModels
             if (IsBusy) return;
             IsBusy = true;
 
-            var viajes = await _viajeService.GetGuideTripsAsync("GUIA_TEST");
+            var viajes = await _viajeService.GetGuideTripsAsync();
 
             ViajesActivos.Clear();
             foreach (var viaje in viajes)

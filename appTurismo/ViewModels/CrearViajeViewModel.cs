@@ -32,20 +32,43 @@ namespace appTurismo.ViewModels
 
         private async Task GuardarViaje()
         {
-            if (string.IsNullOrWhiteSpace(NombrePaquete)) return;
+            if (IsBusy) return;
 
-            // Generamos el código matemático que Supabase exige
-            var uuidReal = Guid.NewGuid().ToString();
-
-            var nuevoViaje = new GrupoTour
+            if (string.IsNullOrWhiteSpace(NombrePaquete))
             {
-                IdTourGroup = uuidReal,
-                Nombre = NombrePaquete, // Guardamos el nombre "Playa" en su nueva columna
-                FechaInicio = DateTime.Now
-            };
+                await Shell.Current.DisplayAlertAsync("Falta el nombre", "Escribe un nombre para el viaje.", "OK");
+                return;
+            }
 
-            await _viajeService.CreateTripAsync(nuevoViaje, CheckpointsNuevos.ToList());
-            await Shell.Current.GoToAsync("..");
+            if (CheckpointsNuevos.Count == 0)
+            {
+                await Shell.Current.DisplayAlertAsync("Falta la ruta", "Agrega al menos un checkpoint antes de guardar.", "OK");
+                return;
+            }
+
+            IsBusy = true;
+            try
+            {
+                var nuevoViaje = new GrupoTour
+                {
+                    IdTourGroup = Guid.NewGuid().ToString(),
+                    Nombre = NombrePaquete,
+                    FechaInicio = DateTime.Now
+                };
+
+                await _viajeService.CreateTripAsync(nuevoViaje, CheckpointsNuevos.ToList());
+                await Shell.Current.DisplayAlertAsync("Viaje creado", "La ruta se guardó correctamente.", "OK");
+                await Shell.Current.GoToAsync("..");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error al guardar viaje: {ex.Message}");
+                await Shell.Current.DisplayAlertAsync("Error al guardar", "No se pudo crear la ruta. Revisa tu sesión o la configuración de Supabase.", "OK");
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
     }
 }
