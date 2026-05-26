@@ -14,6 +14,8 @@
             Routing.RegisterRoute("AsistenciaCheckpointPage", typeof(Views.AsistenciaCheckpointPage));
             Routing.RegisterRoute("RegistrarIncidenciaPage", typeof(Views.RegistrarIncidenciaPage));
             Routing.RegisterRoute("DetalleIncidenciaPage", typeof(Views.DetalleIncidenciaPage));
+            Routing.RegisterRoute("DetalleViajeTuristaPage", typeof(Views.DetalleViajeTuristaPage));
+            Routing.RegisterRoute("MapaViajeTuristaPage", typeof(Views.MapaViajeTuristaPage));
         }
     }
 }

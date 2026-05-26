@@ -33,9 +33,16 @@
             ContentTemplate="{DataTemplate views:PerfilGuiaPage}" />
     </TabBar>
 
-    <ShellContent
-        Route="UserPage"
-        ContentTemplate="{DataTemplate views:UserPage}" 
-        Shell.NavBarIsVisible="False" />
+    <TabBar Route="TuristaTabs">
+        <ShellContent
+            Title="Mis Viajes"
+            Route="UserPage"
+            ContentTemplate="{DataTemplate views:UserPage}" />
+
+        <ShellContent
+            Title="Operaci&#243;n"
+            Route="OperacionTuristaPage"
+            ContentTemplate="{DataTemplate views:OperacionTuristaPage}" />
+    </TabBar>
 
 </Shell>

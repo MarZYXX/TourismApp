@@ -2,11 +2,11 @@ using appTurismo.ViewModels;
 
 namespace appTurismo.Views;
 
-public partial class UserPage : ContentPage
+public partial class OperacionTuristaPage : ContentPage
 {
-    private readonly ViajesTuristaViewModel _viewModel;
+    private readonly OperacionTuristaViewModel _viewModel;
 
-    public UserPage(ViajesTuristaViewModel viewModel)
+    public OperacionTuristaPage(OperacionTuristaViewModel viewModel)
     {
         InitializeComponent();
         _viewModel = viewModel;
@@ -16,6 +16,6 @@ public partial class UserPage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        _viewModel.CargarViajesCommand.Execute(null);
+        _viewModel.CargarOperacionCommand.Execute(null);
     }
 }

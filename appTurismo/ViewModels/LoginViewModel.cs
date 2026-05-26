@@ -57,9 +57,7 @@ namespace appTurismo.ViewModels
                 }
                 else if (userRole == "turista")
                 {
-                    // Te mandará a la futura pantalla del Turista
-                    // Por ahora la dejamos apuntando a MainPage o a la que tengas
-                    await Shell.Current.GoToAsync("//UserPage");
+                    await Shell.Current.GoToAsync("//TuristaTabs/UserPage");
                 }
                 else
                 {

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+             x:Class="appTurismo.Views.MapaViajeTuristaPage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="*,Auto">
+        <mapsui:MapView x:Name="mapView" />
+
+        <Border Grid.Row="1" Padding="12" BackgroundColor="White" Stroke="#E0E0E0">
+            <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="{Binding Viaje.Nombre}" FontSize="18" FontAttributes="Bold" />
+                    <ActivityIndicator Grid.Column="1" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="#2196F3" />
+                </Grid>
+                <CollectionView ItemsSource="{Binding Checkpoints}" HeightRequest="190" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,3" Padding="9" Stroke="#E0E0E0" BackgroundColor="#FAFAFA">
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                                    <Label Text="{Binding Orden}" FontAttributes="Bold" TextColor="#1565C0" />
+                                    <Label Grid.Column="1" Text="{Binding Nombre}" FontAttributes="Bold" />
+                                    <Label Grid.Column="2" Text="Pendiente" FontSize="12" TextColor="#E53935">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding Completado}" Value="True">
+                                                <Setter Property="Text" Value="Completado" />
+                                                <Setter Property="TextColor" Value="#2E7D32" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

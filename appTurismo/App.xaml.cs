@@ -37,7 +37,7 @@ namespace appTurismo
                     }
                     else if (userRole == "turista")
                     {
-                        await Shell.Current.GoToAsync("//UserPage");
+                        await Shell.Current.GoToAsync("//TuristaTabs/UserPage");
                     }
                 }
             }

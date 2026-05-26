@@ -10,6 +10,9 @@ namespace appTurismo.Services
     {
         Task<List<GrupoTour>> GetGuideTripsAsync();
         Task<GrupoTour?> GetGuideTripAsync(string grupoId);
+        Task<List<ViajeTurista>> GetTouristTripsAsync();
+        Task<ViajeTurista?> GetTouristTripAsync(string grupoId);
+        Task<List<Checkpoint>> GetTouristTripCheckpointsAsync(string grupoId);
         Task<List<Models.Supabase.User>> GetAssignedTouristsAsync(string grupoId);
         Task<List<Models.Supabase.User>> GetAvailableTouristsAsync(string grupoId);
         Task AddParticipantAsync(string grupoId, Guid turistaId);
@@ -107,6 +110,70 @@ namespace appTurismo.Services
                 PuntoEncuentro = grupo.PuntoEncuentro,
                 CupoMaximo = grupo.CupoMaximo
             };
+        }
+
+        public async Task<List<ViajeTurista>> GetTouristTripsAsync()
+        {
+            var userId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (!Guid.TryParse(userId, out var turistaId))
+            {
+                return new List<ViajeTurista>();
+            }
+
+            var asignaciones = await _supabaseClient.From<GrupoParticipante>()
+                                                    .Where(p => p.IdUsuario == turistaId)
+                                                    .Get();
+            var resultado = new List<ViajeTurista>();
+
+            foreach (var asignacion in asignaciones.Models)
+            {
+                var grupoResponse = await _supabaseClient.From<Grupo>()
+                                                        .Where(g => g.IdTourGroup == asignacion.IdGrupo)
+                                                        .Get();
+                var grupo = grupoResponse.Models.FirstOrDefault();
+                if (grupo == null) continue;
+
+                Models.Supabase.User? guia = null;
+                if (Guid.TryParse(grupo.GuiaId, out var guiaId))
+                {
+                    var guiaResponse = await _supabaseClient.From<Models.Supabase.User>()
+                                                           .Where(u => u.Id_usuario == guiaId)
+                                                           .Get();
+                    guia = guiaResponse.Models.FirstOrDefault();
+                }
+
+                resultado.Add(new ViajeTurista
+                {
+                    Viaje = ConvertirGrupo(grupo),
+                    EstadoParticipacion = asignacion.Estado,
+                    NombreGuia = guia == null
+                        ? "Guia asignado"
+                        : $"{guia.Nombre} {guia.Apellido_paterno}".Trim(),
+                    TelefonoGuia = guia?.Telefono ?? string.Empty
+                });
+            }
+
+            return resultado.OrderByDescending(v => v.FechaInicio).ToList();
+        }
+
+        public async Task<ViajeTurista?> GetTouristTripAsync(string grupoId)
+        {
+            return (await GetTouristTripsAsync())
+                .FirstOrDefault(v => v.IdTourGroup == grupoId);
+        }
+
+        public async Task<List<Checkpoint>> GetTouristTripCheckpointsAsync(string grupoId)
+        {
+            if (await GetTouristTripAsync(grupoId) == null)
+            {
+                throw new InvalidOperationException("Este viaje no esta asignado al turista autenticado.");
+            }
+
+            var respuesta = await _supabaseClient.From<Checkpoint>()
+                                                 .Where(c => c.IdGrupo == grupoId)
+                                                 .Order(c => c.Orden, Supabase.Postgrest.Constants.Ordering.Ascending)
+                                                 .Get();
+            return respuesta.Models;
         }
 
         public async Task CreateTripAsync(GrupoTour grupo, List<Checkpoint> puntos)
@@ -574,5 +641,18 @@ namespace appTurismo.Services
 
             return response.Models;
         }
+
+        private static GrupoTour ConvertirGrupo(Grupo grupo) => new()
+        {
+            IdTourGroup = grupo.IdTourGroup,
+            IdPaquete = grupo.IdPaquete,
+            GuiaId = grupo.GuiaId,
+            Nombre = grupo.Nombre ?? "Viaje Sin Nombre",
+            Estado = grupo.Estado,
+            FechaInicio = grupo.FechaInicio,
+            Descripcion = grupo.Descripcion,
+            PuntoEncuentro = grupo.PuntoEncuentro,
+            CupoMaximo = grupo.CupoMaximo
+        };
     }
 }

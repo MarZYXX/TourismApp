@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="appTurismo.Views.OperacionTuristaPage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*" Padding="20" RowSpacing="18">
+        <VerticalStackLayout Spacing="7">
+            <Label Text="Mi recorrido en marcha"
+                   FontSize="26"
+                   FontAttributes="Bold" />
+            <Label Text="Consulta la ruta y el avance registrado por tu guia."
+                   FontSize="14"
+                   TextColor="#555555" />
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"
+                               Color="#2196F3"
+                               HorizontalOptions="Start" />
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding ViajesActivos}" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Border Padding="18" Stroke="#E0E0E0" BackgroundColor="#FAFAFA">
+                    <VerticalStackLayout Spacing="7">
+                        <Label Text="No tienes recorridos activos."
+                               FontSize="18"
+                               FontAttributes="Bold" />
+                        <Label Text="Cuando el guia inicie uno de tus viajes, aparecera aqui."
+                               TextColor="#666666" />
+                    </VerticalStackLayout>
+                </Border>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="16" Margin="0,0,0,12" Stroke="#C8E6C9" BackgroundColor="#F1F8E9">
+                        <VerticalStackLayout Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="{Binding Nombre}"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="#1B5E20" />
+                                <Label Grid.Column="1" Text="Activo"
+                                       FontAttributes="Bold"
+                                       TextColor="#2E7D32"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                            <Label Text="{Binding NombreGuia, StringFormat='Guia: {0}'}" />
+                            <Label Text="{Binding PuntoEncuentro, StringFormat='Encuentro: {0}'}"
+                                   TextColor="#555555" />
+                            <Label Text="{Binding EstadoParticipacion, StringFormat='Mi participacion: {0}'}"
+                                   FontAttributes="Bold"
+                                   TextColor="#1565C0" />
+                            <Border Padding="10" Stroke="#90CAF9" BackgroundColor="#E3F2FD">
+                                <Label Text="{Binding ProgresoTexto}"
+                                       TextColor="#1565C0"
+                                       FontAttributes="Bold" />
+                            </Border>
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button Text="Abrir ruta"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.AbrirRutaCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#FF9800"
+                                        TextColor="White" />
+                                <Button Grid.Column="1"
+                                        Text="Detalle"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerDetalleCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#2196F3"
+                                        TextColor="White" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

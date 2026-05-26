@@ -2,11 +2,105 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="appTurismo.Views.UserPage"
-             Title="User Page">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*" Padding="18" RowSpacing="14">
+        <VerticalStackLayout Spacing="13">
+            <Label Text="Mis Viajes"
+                   FontSize="27"
+                   FontAttributes="Bold" />
+            <Label Text="Consulta los recorridos a los que has sido asignado."
+                   FontSize="14"
+                   TextColor="#555555" />
+
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                <Border Padding="10" BackgroundColor="#FFF8E1" Stroke="#FFE082" StrokeThickness="1">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding TotalProximos}" FontSize="22" FontAttributes="Bold" TextColor="#F57C00" />
+                        <Label Text="Proximos" FontSize="11" TextColor="#555555" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" Padding="10" BackgroundColor="#E3F2FD" Stroke="#90CAF9" StrokeThickness="1">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding TotalEnCurso}" FontSize="22" FontAttributes="Bold" TextColor="#1565C0" />
+                        <Label Text="En curso" FontSize="11" TextColor="#555555" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="2" Padding="10" BackgroundColor="#E8F5E9" Stroke="#A5D6A7" StrokeThickness="1">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding TotalFinalizados}" FontSize="22" FontAttributes="Bold" TextColor="#2E7D32" />
+                        <Label Text="Finalizados" FontSize="11" TextColor="#555555" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+
+            <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout Spacing="8">
+                    <Button Text="Todos" Command="{Binding FiltrarCommand}" CommandParameter="Todos"
+                            BackgroundColor="#455A64" TextColor="White" />
+                    <Button Text="Proximos" Command="{Binding FiltrarCommand}" CommandParameter="Plan"
+                            BackgroundColor="#FFB300" TextColor="White" />
+                    <Button Text="En curso" Command="{Binding FiltrarCommand}" CommandParameter="Activo"
+                            BackgroundColor="#1976D2" TextColor="White" />
+                    <Button Text="Finalizados" Command="{Binding FiltrarCommand}" CommandParameter="Completado"
+                            BackgroundColor="#388E3C" TextColor="White" />
+                    <Button Text="Cancelados" Command="{Binding FiltrarCommand}" CommandParameter="Cancelado"
+                            BackgroundColor="#757575" TextColor="White" />
+                </HorizontalStackLayout>
+            </ScrollView>
+
+            <Grid ColumnDefinitions="*,Auto">
+                <Label Text="{Binding TituloFiltro}" FontSize="18" FontAttributes="Bold" />
+                <ActivityIndicator Grid.Column="1" IsVisible="{Binding IsBusy}" IsRunning="{Binding IsBusy}" Color="#2196F3" />
+            </Grid>
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding ViajesFiltrados}" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Border Padding="18" Stroke="#E0E0E0" BackgroundColor="#FAFAFA">
+                    <Label Text="No tienes viajes asignados en esta categoria."
+                           TextColor="#666666"
+                           HorizontalTextAlignment="Center" />
+                </Border>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="14" Margin="0,0,0,12" Stroke="#E0E0E0" StrokeThickness="1" BackgroundColor="White">
+                        <VerticalStackLayout Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="{Binding Nombre}" FontSize="20" FontAttributes="Bold" TextColor="#1B5E20" />
+                                <Label Grid.Column="1" Text="{Binding Estado}" FontAttributes="Bold" TextColor="#F57C00">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Estado}" Value="Activo">
+                                            <Setter Property="TextColor" Value="#1565C0" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Estado}" Value="Completado">
+                                            <Setter Property="TextColor" Value="#2E7D32" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label" Binding="{Binding Estado}" Value="Cancelado">
+                                            <Setter Property="TextColor" Value="#616161" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                            <Label Text="{Binding FechaInicio, StringFormat='Inicio: {0:dd/MM/yyyy HH:mm}'}" TextColor="#555555" />
+                            <Label Text="{Binding PuntoEncuentro, StringFormat='Encuentro: {0}'}" TextColor="#555555" />
+                            <Label Text="{Binding NombreGuia, StringFormat='Guia: {0}'}" TextColor="#555555" />
+                            <Label Text="{Binding EstadoParticipacion, StringFormat='Mi participacion: {0}'}"
+                                   FontSize="12" TextColor="#1565C0" />
+                            <Button Text="Ver detalle"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerDetalleCommand}"
+                                    CommandParameter="{Binding .}"
+                                    BackgroundColor="#2196F3"
+                                    TextColor="White" />
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>
