@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="appTurismo.Views.CatalogoViajesPage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*" Padding="18" RowSpacing="16">
+        <VerticalStackLayout Spacing="9">
+            <Label Text="Explora viajes"
+                   FontSize="28"
+                   FontAttributes="Bold" />
+            <Label Text="Descubre recorridos publicados por los guías y únete al que más te interese."
+                   TextColor="#555555" />
+            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
+                <Label Text="Disponibles"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+                <ActivityIndicator Grid.Column="1"
+                                   IsVisible="{Binding IsBusy}"
+                                   IsRunning="{Binding IsBusy}"
+                                   Color="#2196F3" />
+            </Grid>
+        </VerticalStackLayout>
+
+        <CollectionView Grid.Row="1" ItemsSource="{Binding ViajesDisponibles}" SelectionMode="None">
+            <CollectionView.EmptyView>
+                <Border Padding="20" Stroke="#E0E0E0" BackgroundColor="#FAFAFA">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="No hay viajes disponibles por ahora."
+                               FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Los recorridos planificados con cupo aparecerán aquí."
+                               TextColor="#666666"
+                               FontSize="13"
+                               HorizontalTextAlignment="Center" />
+                    </VerticalStackLayout>
+                </Border>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="15" Margin="0,0,0,13" Stroke="#C8E6C9" StrokeThickness="1" BackgroundColor="#F1F8E9">
+                        <VerticalStackLayout Spacing="8">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="{Binding Nombre}"
+                                       FontSize="21"
+                                       FontAttributes="Bold"
+                                       TextColor="#1B5E20" />
+                                <Border Grid.Column="1" Padding="8,4" BackgroundColor="#E3F2FD" Stroke="#90CAF9">
+                                    <Label Text="{Binding CupoTexto}"
+                                           FontSize="11"
+                                           FontAttributes="Bold"
+                                           TextColor="#1565C0" />
+                                </Border>
+                            </Grid>
+                            <Label Text="{Binding Descripcion, TargetNullValue='Recorrido turístico disponible.'}"
+                                   TextColor="#555555" />
+                            <Label Text="{Binding FechaInicio, StringFormat='Inicio: {0:dd/MM/yyyy HH:mm}'}" />
+                            <Label Text="{Binding PuntoEncuentro, StringFormat='Encuentro: {0}'}" />
+                            <Label Text="{Binding NombreGuia, StringFormat='Guía: {0}'}" />
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                <Button Text="Ver detalles"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerDetalleCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#2196F3"
+                                        TextColor="White"
+                                        HeightRequest="48" />
+                                <Button Grid.Column="1"
+                                        Text="Unirme"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.InscribirseCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#2E7D32"
+                                        TextColor="White"
+                                        HeightRequest="48" />
+                            </Grid>
+                        </VerticalStackLayout>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>

@@ -8,7 +8,7 @@ namespace appTurismo.ViewModels
         [NotifyPropertyChangedFor(nameof(IsNotBusy))]
         bool _isBusy;
         [ObservableProperty]
-        string _title;
+        string _title = string.Empty;
         public bool IsNotBusy => !IsBusy;
     }
 }

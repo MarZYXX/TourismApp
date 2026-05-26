@@ -90,7 +90,7 @@
                         BackgroundColor="#2E7D32"
                         TextColor="White"
                         HeightRequest="48" />
-                <Label Text="Marca todos los checkpoints para habilitar la finalizacion."
+                <Label Text="Marca todos los checkpoints para habilitar la finalización."
                        IsVisible="{Binding EsRecorridoActivo}"
                        FontSize="12"
                        TextColor="#666666"

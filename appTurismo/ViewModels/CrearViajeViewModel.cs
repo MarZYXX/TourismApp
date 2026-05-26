@@ -12,7 +12,7 @@ namespace appTurismo.ViewModels
     {
         private readonly IViajeService _viajeService;
 
-        private string _nombrePaquete;
+        private string _nombrePaquete = string.Empty;
         public string NombrePaquete
         {
             get => _nombrePaquete;

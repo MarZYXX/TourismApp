@@ -28,15 +28,15 @@
                     SelectedItem="{Binding TipoSeleccionado}"
                     ItemDisplayBinding="{Binding Etiqueta}" />
 
-            <Label Text="Descripcion" FontAttributes="Bold" />
+            <Label Text="Descripción" FontAttributes="Bold" />
             <Editor Text="{Binding Descripcion}"
-                    Placeholder="Describe lo ocurrido y la accion tomada por el guia."
+                    Placeholder="Describe lo ocurrido y la acción tomada por el guía."
                     HeightRequest="110"
                     AutoSize="TextChanges" />
 
             <Grid ColumnDefinitions="*,Auto" Padding="0,4">
                 <VerticalStackLayout>
-                    <Label Text="Requiere atencion"
+                    <Label Text="Requiere atención"
                            FontAttributes="Bold" />
                     <Label Text="Señala casos que deban atenderse con prioridad."
                            FontSize="12"
@@ -51,7 +51,7 @@
                 <VerticalStackLayout>
                     <Label Text="Retirar del recorrido"
                            FontAttributes="Bold" />
-                    <Label Text="Dejara de aparecer en los siguientes pases de lista."
+                    <Label Text="Dejará de aparecer en los siguientes pases de lista."
                            FontSize="12"
                            TextColor="#666666" />
                 </VerticalStackLayout>

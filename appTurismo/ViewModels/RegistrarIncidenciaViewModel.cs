@@ -112,7 +112,7 @@ namespace appTurismo.ViewModels
 
             if (_turistaId == Guid.Empty || string.IsNullOrWhiteSpace(_grupoId))
             {
-                await Shell.Current.DisplayAlertAsync("Error", "No se encontro el participante del recorrido.", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", "No se encontró el participante del recorrido.", "OK");
                 return;
             }
 
@@ -145,7 +145,7 @@ namespace appTurismo.ViewModels
                     Longitud = longitud
                 }, RetirarParticipante);
 
-                await Shell.Current.DisplayAlertAsync("Incidencia registrada", "El evento fue agregado a Operacion.", "OK");
+                await Shell.Current.DisplayAlertAsync("Incidencia registrada", "El evento fue agregado a Operación.", "OK");
                 await Shell.Current.GoToAsync("..");
             }
             catch (Exception ex)
@@ -170,7 +170,7 @@ namespace appTurismo.ViewModels
             if (ex.Message.Contains("row-level security", StringComparison.OrdinalIgnoreCase) ||
                 ex.Message.Contains("42501", StringComparison.OrdinalIgnoreCase))
             {
-                return "Supabase bloqueo el registro por permisos RLS. Ejecuta el script actualizado de incidencias para habilitar el registro seguro del guia.";
+                return "Supabase bloqueó el registro por permisos RLS. Ejecuta el script actualizado de incidencias para habilitar el registro seguro del guía.";
             }
 
             return ex.Message;

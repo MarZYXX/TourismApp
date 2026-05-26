@@ -186,7 +186,7 @@ namespace appTurismo.ViewModels
 
             if (!int.TryParse(CupoMaximo, out var cupo) || cupo <= 0)
             {
-                await Shell.Current.DisplayAlertAsync("Cupo invalido", "Indica un cupo mayor que cero.", "OK");
+                await Shell.Current.DisplayAlertAsync("Cupo inválido", "Indica un cupo mayor que cero.", "OK");
                 return;
             }
 
@@ -199,7 +199,7 @@ namespace appTurismo.ViewModels
             var fechaProgramada = FechaInicio.Date.Add(HoraInicio);
             if (fechaProgramada <= DateTime.Now)
             {
-                await Shell.Current.DisplayAlertAsync("Fecha invalida", "Programa el viaje para una fecha y hora futuras.", "OK");
+                await Shell.Current.DisplayAlertAsync("Fecha inválida", "Programa el viaje para una fecha y hora futuras.", "OK");
                 return;
             }
 

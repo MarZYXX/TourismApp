@@ -8,13 +8,13 @@ namespace appTurismo.Models
     {
         // En Supabase la llave primaria se llama id_checkpoint
         [PrimaryKey("id_checkpoint", true)]
-        public string IdCheckpoint { get; set; }
+        public string IdCheckpoint { get; set; } = string.Empty;
 
         [Column("id_grupo")]
-        public string IdGrupo { get; set; }
+        public string IdGrupo { get; set; } = string.Empty;
 
         [Column("nombre")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
 
         [Column("latitud")]
         public double Latitud { get; set; }

@@ -12,7 +12,7 @@
         <CollectionView Grid.Row="1" ItemsSource="{Binding ListaCheckpoints}" Margin="15">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame Margin="0,5" Padding="15" CornerRadius="10" BackgroundColor="#F5F5F5" BorderColor="#ccc">
+                    <Border Margin="0,5" Padding="15" BackgroundColor="#F5F5F5" Stroke="#CCCCCC" StrokeThickness="1">
                         <Grid ColumnDefinitions="*, Auto">
                             <VerticalStackLayout Grid.Column="0" VerticalOptions="Center">
                                 <Label Text="{Binding Nombre}" FontSize="16" FontAttributes="Bold" TextColor="#333" />
@@ -20,14 +20,14 @@
                                 <Label Text="Pendiente" TextColor="#F44336" FontSize="12" FontAttributes="Bold">
                                     <Label.Triggers>
                                         <DataTrigger TargetType="Label" Binding="{Binding Completado}" Value="True">
-                                            <Setter Property="Text" Value="¡Completado!" />
+                                            <Setter Property="Text" Value="Completado" />
                                             <Setter Property="TextColor" Value="#4CAF50" />
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
                             </VerticalStackLayout>
 
-                            <Button Grid.Column="1" Text="✅ Marcar" 
+                            <Button Grid.Column="1" Text="Marcar"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.MarcarCompletadoCommand}"
                                     CommandParameter="{Binding .}"
                                     BackgroundColor="#2196F3" TextColor="White" 
@@ -41,7 +41,7 @@
                                 </Button.Triggers>
                             </Button>
                         </Grid>
-                    </Frame>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

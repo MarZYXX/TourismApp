@@ -5,12 +5,27 @@
              x:Class="appTurismo.Views.LoginPage"
              Shell.FlyoutItemIsVisible="False"
              Shell.NavBarIsVisible="False"
-             Title="Login">
+             Title="TourTrack">
 
+    <ScrollView>
     <VerticalStackLayout Padding="30" VerticalOptions="Center" Spacing="15">
-        <Label Text="¡Bienvenido!" FontSize="32" FontAttributes="Bold" HorizontalOptions="Center" Margin="0,0,0,20"/>
+        <Image Source="tourtrack_logo.png"
+               HeightRequest="175"
+               WidthRequest="175"
+               Aspect="AspectFit"
+               HorizontalOptions="Center" />
+        <Label Text="TourTrack"
+               FontSize="34"
+               FontAttributes="Bold"
+               TextColor="#1565C0"
+               HorizontalOptions="Center" />
+        <Label Text="Sigue cada ruta, vive cada destino"
+               FontSize="15"
+               TextColor="#555555"
+               HorizontalOptions="Center"
+               Margin="0,0,0,18" />
 
-        <Entry Placeholder="Correo Electrónico" Text="{Binding Email}" Keyboard="Email" HeightRequest="50"/>
+        <Entry Placeholder="Correo electrónico" Text="{Binding Email}" Keyboard="Email" HeightRequest="50"/>
         <Entry Placeholder="Contraseña" Text="{Binding Password}" IsPassword="True" HeightRequest="50"/>
 
         <Button Text="Ingresar" Command="{Binding LoginCommand}" IsEnabled="{Binding IsNotBusy}" Margin="0,15,0,0" HeightRequest="50"/>
@@ -22,4 +37,5 @@
 
         <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" HorizontalOptions="Center"/>
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

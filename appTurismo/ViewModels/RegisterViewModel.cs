@@ -51,13 +51,13 @@ namespace appTurismo.ViewModels
 
             if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(Nombre))
             {
-                await Shell.Current.DisplayAlert("Faltan Datos", "Email, Password, y Nombre son obligatorios.", "OK");
+                await Shell.Current.DisplayAlertAsync("Faltan datos", "Correo, contraseña y nombre son obligatorios.", "OK");
                 return;
             }
 
             if (_connectivity.NetworkAccess != NetworkAccess.Internet)
             {
-                await Shell.Current.DisplayAlert("Sin Conexión", "No hay acceso a internet.", "OK");
+                await Shell.Current.DisplayAlertAsync("Sin conexión", "No hay acceso a internet.", "OK");
                 return;
             }
 
@@ -80,7 +80,7 @@ namespace appTurismo.ViewModels
             if (success)
             {
                 // ÉXITO: Dependiendo de tu lógica, puedes enviarlo al Login o loguearlo automáticamente
-                await Shell.Current.DisplayAlert("¡Bienvenido!", "Registro exitoso.", "OK");
+                await Shell.Current.DisplayAlertAsync("¡Bienvenido!", "Registro exitoso.", "OK");
 
                 // Si quieres que el usuario entre directamente sin volver a escribir su pass:
                 // await Shell.Current.GoToAsync("//MainPage"); 
@@ -90,7 +90,7 @@ namespace appTurismo.ViewModels
             }
             else
             {
-                await Shell.Current.DisplayAlert("Error", "No se pudo registrar. Verifica que el correo no esté en uso.", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", "No se pudo registrar. Verifica que el correo no esté en uso.", "OK");
             }
         }
 

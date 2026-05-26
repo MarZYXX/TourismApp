@@ -23,6 +23,65 @@
                                    HorizontalOptions="Start" />
             </VerticalStackLayout>
 
+            <Label Text="Alertas SOS activas"
+                   FontSize="19"
+                   FontAttributes="Bold"
+                   TextColor="#C62828" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding AlertasSos}"
+                                 Spacing="8">
+                <BindableLayout.EmptyView>
+                    <Border Padding="12"
+                            Stroke="#C8E6C9"
+                            StrokeThickness="1"
+                            BackgroundColor="#F1F8E9">
+                        <Label Text="No hay solicitudes SOS activas."
+                               TextColor="#2E7D32" />
+                    </Border>
+                </BindableLayout.EmptyView>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="12"
+                                Stroke="#EF9A9A"
+                                StrokeThickness="1"
+                                BackgroundColor="#FFEBEE">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="SOS - Necesita ayuda"
+                                           FontAttributes="Bold"
+                                           TextColor="#C62828"
+                                           FontSize="17" />
+                                    <Label Grid.Column="1"
+                                           Text="ACTIVO"
+                                           FontAttributes="Bold"
+                                           TextColor="#C62828" />
+                                </Grid>
+                                <Label Text="{Binding NombreTurista, StringFormat='Turista: {0}'}" />
+                                <Label Text="{Binding NombreViaje, StringFormat='Viaje: {0}'}" />
+                                <Label Text="{Binding FechaVisible, StringFormat='Enviado: {0}'}"
+                                       FontSize="12"
+                                       TextColor="#555555" />
+                                <Label Text="{Binding UbicacionVisible, StringFormat='Ubicación: {0}'}"
+                                       FontSize="12"
+                                       TextColor="#555555" />
+                                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                                    <Button Text="Ver ubicación"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerUbicacionSosCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#D32F2F"
+                                            TextColor="White" />
+                                    <Button Grid.Column="1"
+                                            Text="Resolver"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ResolverSosCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#2E7D32"
+                                            TextColor="White" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
             <Label Text="Incidencias pendientes"
                    FontSize="19"
                    FontAttributes="Bold" />
@@ -143,7 +202,7 @@
             <VerticalStackLayout BindableLayout.ItemsSource="{Binding HistorialIncidencias}"
                                  Spacing="8">
                 <BindableLayout.EmptyView>
-                    <Label Text="Todavia no hay incidencias cerradas."
+                    <Label Text="Todavía no hay incidencias cerradas."
                            TextColor="#666666" />
                 </BindableLayout.EmptyView>
                 <BindableLayout.ItemTemplate>
@@ -166,6 +225,54 @@
                                 <Button Grid.Column="1"
                                         Text="Ver"
                                         Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerIncidenciaCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="#757575"
+                                        TextColor="White" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+
+            <Label Text="Historial de alertas SOS resueltas"
+                   FontSize="19"
+                   FontAttributes="Bold"
+                   Margin="0,8,0,0" />
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding HistorialSos}"
+                                 Spacing="8">
+                <BindableLayout.EmptyView>
+                    <Label Text="Todavía no hay alertas SOS resueltas."
+                           TextColor="#666666" />
+                </BindableLayout.EmptyView>
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="10"
+                                Stroke="#E0E0E0"
+                                StrokeThickness="1"
+                                BackgroundColor="#FAFAFA">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <VerticalStackLayout Spacing="2">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label Text="SOS atendido"
+                                               FontAttributes="Bold"
+                                               TextColor="#555555" />
+                                        <Label Grid.Column="1"
+                                               Text="RESUELTO"
+                                               FontSize="11"
+                                               FontAttributes="Bold"
+                                               TextColor="#2E7D32" />
+                                    </Grid>
+                                    <Label Text="{Binding NombreTurista, StringFormat='Turista: {0}'}"
+                                           FontSize="12" />
+                                    <Label Text="{Binding NombreViaje, StringFormat='Viaje: {0}'}"
+                                           FontSize="12" />
+                                    <Label Text="{Binding FechaVisible, StringFormat='Solicitado: {0}'}"
+                                           FontSize="12"
+                                           TextColor="#666666" />
+                                </VerticalStackLayout>
+                                <Button Grid.Column="1"
+                                        Text="Ver ubicación"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerUbicacionSosCommand}"
                                         CommandParameter="{Binding .}"
                                         BackgroundColor="#757575"
                                         TextColor="White" />

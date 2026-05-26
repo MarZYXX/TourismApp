@@ -3,7 +3,7 @@ using appTurismo.Services;
 
 namespace appTurismo.ViewModels
 {
-    public class PerfilGuiaViewModel : GuiaBaseViewModel
+    public class PerfilTuristaViewModel : GuiaBaseViewModel
     {
         private readonly IUserService _userService;
         private readonly IViajeService _viajeService;
@@ -13,10 +13,12 @@ namespace appTurismo.ViewModels
         private string _apellidoPaterno = string.Empty;
         private string _apellidoMaterno = string.Empty;
         private string _telefono = string.Empty;
-        private int _viajesPlanificados;
+        private int _viajesProximos;
         private int _viajesEnCurso;
         private int _viajesFinalizados;
         private int _viajesCancelados;
+        private int _sosEnviados;
+        private int _sosAtendidos;
 
         public Models.Supabase.User? Perfil
         {
@@ -34,7 +36,7 @@ namespace appTurismo.ViewModels
         public string NombreCompleto => Perfil == null
             ? string.Empty
             : $"{Perfil.Nombre} {Perfil.Apellido_paterno} {Perfil.Apellido_materno}".Trim();
-        public string RolVisible => "Guía";
+        public string RolVisible => "Turista";
 
         public bool EstaEditando
         {
@@ -53,20 +55,20 @@ namespace appTurismo.ViewModels
         public string ApellidoMaterno { get => _apellidoMaterno; set { _apellidoMaterno = value; OnPropertyChanged(); } }
         public string Telefono { get => _telefono; set { _telefono = value; OnPropertyChanged(); } }
 
-        public int ViajesPlanificados { get => _viajesPlanificados; private set { _viajesPlanificados = value; OnPropertyChanged(); } }
+        public int ViajesProximos { get => _viajesProximos; private set { _viajesProximos = value; OnPropertyChanged(); } }
         public int ViajesEnCurso { get => _viajesEnCurso; private set { _viajesEnCurso = value; OnPropertyChanged(); } }
         public int ViajesFinalizados { get => _viajesFinalizados; private set { _viajesFinalizados = value; OnPropertyChanged(); } }
         public int ViajesCancelados { get => _viajesCancelados; private set { _viajesCancelados = value; OnPropertyChanged(); } }
-        public int TotalViajes => ViajesPlanificados + ViajesEnCurso + ViajesFinalizados + ViajesCancelados;
+        public int SosEnviados { get => _sosEnviados; private set { _sosEnviados = value; OnPropertyChanged(); } }
+        public int SosAtendidos { get => _sosAtendidos; private set { _sosAtendidos = value; OnPropertyChanged(); } }
+        public int TotalViajes => ViajesProximos + ViajesEnCurso + ViajesFinalizados + ViajesCancelados;
 
         public ICommand CargarPerfilCommand { get; }
         public ICommand EditarPerfilCommand { get; }
         public ICommand CancelarEdicionCommand { get; }
         public ICommand GuardarPerfilCommand { get; }
 
-        public PerfilGuiaViewModel(
-            IUserService userService,
-            IViajeService viajeService) : base(userService)
+        public PerfilTuristaViewModel(IUserService userService, IViajeService viajeService) : base(userService)
         {
             _userService = userService;
             _viajeService = viajeService;
@@ -88,21 +90,25 @@ namespace appTurismo.ViewModels
                 Perfil = await _userService.GetCurrentUserProfileAsync();
                 if (Perfil == null)
                 {
-                    await Shell.Current.DisplayAlertAsync("Perfil no disponible", "No fue posible obtener tus datos de guía.", "OK");
+                    await Shell.Current.DisplayAlertAsync("Perfil no disponible", "No fue posible obtener tus datos de turista.", "OK");
                     return;
                 }
 
                 CopiarCamposEdicion();
-                var viajes = await _viajeService.GetGuideTripsAsync();
-                ViajesPlanificados = viajes.Count(v => EsEstado(v.Estado, "Plan"));
+                var viajes = await _viajeService.GetTouristTripsAsync();
+                ViajesProximos = viajes.Count(v => EsEstado(v.Estado, "Plan"));
                 ViajesEnCurso = viajes.Count(v => EsEstado(v.Estado, "Activo"));
                 ViajesFinalizados = viajes.Count(v => EsEstado(v.Estado, "Completado"));
                 ViajesCancelados = viajes.Count(v => EsEstado(v.Estado, "Cancelado"));
                 OnPropertyChanged(nameof(TotalViajes));
+
+                var sos = await _viajeService.GetTouristSosHistoryAsync();
+                SosEnviados = sos.Count;
+                SosAtendidos = sos.Count(s => EsEstado(s.Estado, "Resuelto"));
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error al cargar perfil: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error al cargar perfil turista: {ex.Message}");
                 await Shell.Current.DisplayAlertAsync("Error", "No fue posible cargar el perfil.", "OK");
             }
             finally
@@ -154,8 +160,8 @@ namespace appTurismo.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error al actualizar perfil: {ex.Message}");
-                await Shell.Current.DisplayAlertAsync("No se pudo actualizar", "Supabase no permitió actualizar el perfil del guía.", "OK");
+                System.Diagnostics.Debug.WriteLine($"Error al actualizar perfil turista: {ex.Message}");
+                await Shell.Current.DisplayAlertAsync("No se pudo actualizar", "Supabase no permitió actualizar el perfil del turista.", "OK");
             }
             finally
             {

@@ -11,7 +11,7 @@ namespace appTurismo.ViewModels
     {
         private readonly Supabase.Client _supabaseClient;
         private readonly IViajeService _viajeService;
-        private string _grupoId;
+        private string _grupoId = string.Empty;
         private bool _esRecorridoActivo;
 
         public ObservableCollection<Checkpoint> ListaCheckpoints { get; set; }

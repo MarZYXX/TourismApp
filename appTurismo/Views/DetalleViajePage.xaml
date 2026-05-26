@@ -93,13 +93,14 @@
                                             BackgroundColor="White">
                                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                             <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                                <HorizontalStackLayout Spacing="4">
-                                                    <Label Text="{Binding Nombre}" FontAttributes="Bold" />
-                                                    <Label Text="{Binding Apellido_paterno}" FontAttributes="Bold" />
-                                                </HorizontalStackLayout>
-                                                <Label Text="{Binding Correo_electronico}"
+                                                <Label Text="{Binding NombreCompleto}" FontAttributes="Bold" />
+                                                <Label Text="{Binding CorreoElectronico}"
                                                        FontSize="12"
                                                        TextColor="#666666" />
+                                                <Label Text="{Binding ConfirmacionTexto, StringFormat='Asistencia: {0}'}"
+                                                       FontSize="12"
+                                                       FontAttributes="Bold"
+                                                       TextColor="#1565C0" />
                                             </VerticalStackLayout>
                                             <Button Grid.Column="1"
                                                     Text="Quitar"

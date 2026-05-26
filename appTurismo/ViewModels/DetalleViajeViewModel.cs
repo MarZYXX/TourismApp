@@ -32,7 +32,7 @@ namespace appTurismo.ViewModels
         public bool EsRecorridoIniciado =>
             string.Equals(Viaje?.Estado, "Activo", StringComparison.OrdinalIgnoreCase);
 
-        public ObservableCollection<Models.Supabase.User> Participantes { get; } = new();
+        public ObservableCollection<ParticipanteViaje> Participantes { get; } = new();
         public ObservableCollection<Models.Supabase.User> TuristasDisponibles { get; } = new();
 
         public Models.Supabase.User? TuristaSeleccionado
@@ -59,7 +59,7 @@ namespace appTurismo.ViewModels
             VerMapaCommand = new Command(async () => await AbrirMapaAsync());
             GestionarCheckpointsCommand = new Command(async () => await AbrirCheckpointsAsync());
             AgregarParticipanteCommand = new Command(async () => await AgregarParticipanteAsync());
-            QuitarParticipanteCommand = new Command<Models.Supabase.User>(async turista => await QuitarParticipanteAsync(turista));
+            QuitarParticipanteCommand = new Command<ParticipanteViaje>(async turista => await QuitarParticipanteAsync(turista));
             IniciarRecorridoCommand = new Command(async () => await IniciarRecorridoAsync());
         }
 
@@ -122,7 +122,7 @@ namespace appTurismo.ViewModels
             if (Viaje == null) return;
 
             Participantes.Clear();
-            var participantes = await _viajeService.GetAssignedTouristsAsync(Viaje.IdTourGroup);
+            var participantes = await _viajeService.GetGuideParticipantsAsync(Viaje.IdTourGroup);
             foreach (var turista in participantes)
             {
                 Participantes.Add(turista);
@@ -173,13 +173,13 @@ namespace appTurismo.ViewModels
             if (mensaje.Contains("row-level security", StringComparison.OrdinalIgnoreCase) ||
                 mensaje.Contains("permission denied", StringComparison.OrdinalIgnoreCase))
             {
-                return "Supabase rechazo la operacion por permisos RLS. Es necesario autorizar al guia para asignar participantes en sus viajes.";
+                return "Supabase rechazó la operación por permisos RLS. Es necesario autorizar al guía para asignar participantes en sus viajes.";
             }
 
             if (mensaje.Contains("duplicate", StringComparison.OrdinalIgnoreCase) ||
                 mensaje.Contains("already exists", StringComparison.OrdinalIgnoreCase))
             {
-                return "Este turista ya esta asignado al recorrido.";
+                return "Este turista ya está asignado al recorrido.";
             }
 
             if (mensaje.Contains("cupo", StringComparison.OrdinalIgnoreCase))
@@ -190,13 +190,13 @@ namespace appTurismo.ViewModels
             return $"Supabase respondio: {mensaje}";
         }
 
-        private async Task QuitarParticipanteAsync(Models.Supabase.User? turista)
+        private async Task QuitarParticipanteAsync(ParticipanteViaje? turista)
         {
             if (Viaje == null || turista == null || !PuedeAdministrarParticipantes) return;
 
             var confirmar = await Shell.Current.DisplayAlertAsync(
                 "Retirar participante",
-                $"Deseas quitar a {turista.Nombre} {turista.Apellido_paterno} del viaje?",
+                $"Deseas quitar a {turista.NombreCompleto} del viaje?",
                 "Quitar",
                 "Cancelar");
 
@@ -205,7 +205,7 @@ namespace appTurismo.ViewModels
             try
             {
                 IsBusy = true;
-                await _viajeService.RemoveParticipantAsync(Viaje.IdTourGroup, turista.Id_usuario);
+                await _viajeService.RemoveParticipantAsync(Viaje.IdTourGroup, turista.Usuario.Id_usuario);
                 await CargarParticipantesAsync();
             }
             catch (Exception ex)

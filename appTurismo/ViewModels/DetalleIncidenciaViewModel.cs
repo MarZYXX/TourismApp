@@ -78,7 +78,7 @@ namespace appTurismo.ViewModels
             {
                 await Shell.Current.DisplayAlertAsync(
                     "Nota requerida",
-                    "Escribe que accion realizo el guia antes de actualizar la incidencia.",
+                    "Escribe qué acción realizó el guía antes de actualizar la incidencia.",
                     "OK");
                 return;
             }
@@ -111,7 +111,7 @@ namespace appTurismo.ViewModels
                 System.Diagnostics.Debug.WriteLine($"Error al actualizar incidencia: {ex.Message}");
                 var mensaje = ex.Message.Contains("actualizar_incidencia_guia", StringComparison.OrdinalIgnoreCase) ||
                               ex.Message.Contains("PGRST202", StringComparison.OrdinalIgnoreCase)
-                    ? "Ejecuta nuevamente el script actualizado de incidencias en Supabase para habilitar la atencion y cierre."
+                    ? "Ejecuta nuevamente el script actualizado de incidencias en Supabase para habilitar la atención y cierre."
                     : ex.Message;
                 await Shell.Current.DisplayAlertAsync("No se pudo actualizar", mensaje, "OK");
             }

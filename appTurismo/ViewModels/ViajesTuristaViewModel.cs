@@ -26,7 +26,7 @@ namespace appTurismo.ViewModels
 
         public string TituloFiltro => Filtro switch
         {
-            "Plan" => "Proximos viajes",
+            "Plan" => "Próximos viajes",
             "Activo" => "Viajes en curso",
             "Completado" => "Viajes finalizados",
             "Cancelado" => "Viajes cancelados",

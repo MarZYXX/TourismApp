@@ -17,5 +17,8 @@ namespace appTurismo.Models
 
         [Column("estado")]
         public string Estado { get; set; } = "Activo";
+
+        [Column("confirmacion_asistencia")]
+        public string ConfirmacionAsistencia { get; set; } = "Pendiente";
     }
 }

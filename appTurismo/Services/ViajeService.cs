@@ -12,8 +12,18 @@ namespace appTurismo.Services
         Task<GrupoTour?> GetGuideTripAsync(string grupoId);
         Task<List<ViajeTurista>> GetTouristTripsAsync();
         Task<ViajeTurista?> GetTouristTripAsync(string grupoId);
+        Task<List<ViajeCatalogo>> GetAvailableCatalogTripsAsync();
+        Task<ViajeCatalogo?> GetCatalogTripAsync(string grupoId);
+        Task<List<Checkpoint>> GetCatalogTripCheckpointsAsync(string grupoId);
+        Task JoinAvailableTripAsync(string grupoId);
         Task<List<Checkpoint>> GetTouristTripCheckpointsAsync(string grupoId);
+        Task SetTouristAttendanceConfirmationAsync(string grupoId, string confirmacion);
+        Task<SosSolicitud?> GetActiveTouristSosAsync(string grupoId);
+        Task<SosSolicitud?> GetLatestResolvedTouristSosAsync(string grupoId);
+        Task<List<SosSolicitud>> GetTouristSosHistoryAsync();
+        Task SendTouristSosAsync(string grupoId, double latitud, double longitud);
         Task<List<Models.Supabase.User>> GetAssignedTouristsAsync(string grupoId);
+        Task<List<ParticipanteViaje>> GetGuideParticipantsAsync(string grupoId);
         Task<List<Models.Supabase.User>> GetAvailableTouristsAsync(string grupoId);
         Task AddParticipantAsync(string grupoId, Guid turistaId);
         Task RemoveParticipantAsync(string grupoId, Guid turistaId);
@@ -22,6 +32,9 @@ namespace appTurismo.Services
         Task RegisterIncidentAsync(IncidenciaParticipante incidencia, bool retirarParticipante);
         Task<List<IncidenciaOperacion>> GetGuideIncidentsAsync();
         Task UpdateIncidentStatusAsync(string incidenciaId, string estado, string notaResolucion);
+        Task<List<SosOperacion>> GetActiveGuideSosAsync();
+        Task<List<SosOperacion>> GetResolvedGuideSosAsync();
+        Task ResolveGuideSosAsync(string sosId);
         Task<List<GrupoTour>> GetActiveGuideTripsAsync();
         Task StartTripAsync(string grupoId);
         Task CompleteTripAsync(string grupoId);
@@ -146,6 +159,7 @@ namespace appTurismo.Services
                 {
                     Viaje = ConvertirGrupo(grupo),
                     EstadoParticipacion = asignacion.Estado,
+                    ConfirmacionAsistencia = asignacion.ConfirmacionAsistencia,
                     NombreGuia = guia == null
                         ? "Guia asignado"
                         : $"{guia.Nombre} {guia.Apellido_paterno}".Trim(),
@@ -162,11 +176,81 @@ namespace appTurismo.Services
                 .FirstOrDefault(v => v.IdTourGroup == grupoId);
         }
 
-        public async Task<List<Checkpoint>> GetTouristTripCheckpointsAsync(string grupoId)
+        public async Task<List<ViajeCatalogo>> GetAvailableCatalogTripsAsync()
         {
-            if (await GetTouristTripAsync(grupoId) == null)
+            var userId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (!Guid.TryParse(userId, out var turistaId))
             {
-                throw new InvalidOperationException("Este viaje no esta asignado al turista autenticado.");
+                return new List<ViajeCatalogo>();
+            }
+
+            var misAsignaciones = await _supabaseClient.From<GrupoParticipante>()
+                                                       .Where(p => p.IdUsuario == turistaId)
+                                                       .Get();
+            var idsAsignados = misAsignaciones.Models
+                .Select(a => a.IdGrupo)
+                .ToHashSet();
+
+            var respuesta = await _supabaseClient.From<Grupo>()
+                                                 .Where(g => g.Estado == "Plan")
+                                                 .Get();
+            var viajes = respuesta.Models
+                .Where(g => g.FechaInicio > DateTime.Now && !idsAsignados.Contains(g.IdTourGroup))
+                .OrderBy(g => g.FechaInicio)
+                .ToList();
+            var resultado = new List<ViajeCatalogo>();
+
+            foreach (var grupo in viajes)
+            {
+                var participantes = await _supabaseClient.From<GrupoParticipante>()
+                                                         .Where(p => p.IdGrupo == grupo.IdTourGroup)
+                                                         .Where(p => p.Estado == "Activo")
+                                                         .Get();
+                var nombreGuia = "Guía por confirmar";
+                if (Guid.TryParse(grupo.GuiaId, out var guiaId))
+                {
+                    var guiaResponse = await _supabaseClient.From<Models.Supabase.User>()
+                                                           .Where(u => u.Id_usuario == guiaId)
+                                                           .Get();
+                    var guia = guiaResponse.Models.FirstOrDefault();
+                    if (guia != null)
+                    {
+                        nombreGuia = $"{guia.Nombre} {guia.Apellido_paterno}".Trim();
+                    }
+                }
+
+                var viaje = new ViajeCatalogo
+                {
+                    Viaje = ConvertirGrupo(grupo),
+                    NombreGuia = nombreGuia,
+                    ParticipantesInscritos = participantes.Models.Count
+                };
+
+                if (viaje.TieneCupo)
+                {
+                    resultado.Add(viaje);
+                }
+            }
+
+            return resultado;
+        }
+
+        public async Task<ViajeCatalogo?> GetCatalogTripAsync(string grupoId)
+        {
+            if (string.IsNullOrWhiteSpace(grupoId))
+            {
+                return null;
+            }
+
+            return (await GetAvailableCatalogTripsAsync())
+                .FirstOrDefault(v => v.IdTourGroup == grupoId);
+        }
+
+        public async Task<List<Checkpoint>> GetCatalogTripCheckpointsAsync(string grupoId)
+        {
+            if (await GetCatalogTripAsync(grupoId) == null)
+            {
+                throw new InvalidOperationException("Este viaje ya no se encuentra disponible en el catálogo.");
             }
 
             var respuesta = await _supabaseClient.From<Checkpoint>()
@@ -174,6 +258,109 @@ namespace appTurismo.Services
                                                  .Order(c => c.Orden, Supabase.Postgrest.Constants.Ordering.Ascending)
                                                  .Get();
             return respuesta.Models;
+        }
+
+        public async Task JoinAvailableTripAsync(string grupoId)
+        {
+            if (string.IsNullOrWhiteSpace(grupoId))
+            {
+                throw new InvalidOperationException("Selecciona un viaje disponible.");
+            }
+
+            await _supabaseClient.Rpc<object>("inscribirse_viaje_turista", new Dictionary<string, object>
+            {
+                { "p_id_grupo", grupoId }
+            });
+        }
+
+        public async Task<List<Checkpoint>> GetTouristTripCheckpointsAsync(string grupoId)
+        {
+            if (await GetTouristTripAsync(grupoId) == null)
+            {
+                throw new InvalidOperationException("Este viaje no está asignado al turista autenticado.");
+            }
+
+            var respuesta = await _supabaseClient.From<Checkpoint>()
+                                                 .Where(c => c.IdGrupo == grupoId)
+                                                 .Order(c => c.Orden, Supabase.Postgrest.Constants.Ordering.Ascending)
+                                                 .Get();
+            return respuesta.Models;
+        }
+
+        public async Task SetTouristAttendanceConfirmationAsync(string grupoId, string confirmacion)
+        {
+            if (confirmacion is not ("Confirmado" or "No_asistira"))
+            {
+                throw new InvalidOperationException("La confirmación solicitada no es válida.");
+            }
+
+            await _supabaseClient.Rpc<object>("confirmar_asistencia_turista", new Dictionary<string, object>
+            {
+                { "p_id_grupo", grupoId },
+                { "p_confirmacion", confirmacion }
+            });
+        }
+
+        public async Task<SosSolicitud?> GetActiveTouristSosAsync(string grupoId)
+        {
+            var userId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (!Guid.TryParse(userId, out var turistaId))
+            {
+                return null;
+            }
+
+            var respuesta = await _supabaseClient.From<SosSolicitud>()
+                                                 .Where(s => s.IdGrupoTour == grupoId)
+                                                 .Where(s => s.IdUsuario == turistaId)
+                                                 .Where(s => s.Estado == "Activo")
+                                                 .Get();
+            return respuesta.Models
+                .OrderByDescending(s => s.Timestamp)
+                .FirstOrDefault();
+        }
+
+        public async Task<SosSolicitud?> GetLatestResolvedTouristSosAsync(string grupoId)
+        {
+            var userId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (!Guid.TryParse(userId, out var turistaId))
+            {
+                return null;
+            }
+
+            var respuesta = await _supabaseClient.From<SosSolicitud>()
+                                                 .Where(s => s.IdGrupoTour == grupoId)
+                                                 .Where(s => s.IdUsuario == turistaId)
+                                                 .Where(s => s.Estado == "Resuelto")
+                                                 .Get();
+            return respuesta.Models
+                .OrderByDescending(s => s.Timestamp)
+                .FirstOrDefault();
+        }
+
+        public async Task<List<SosSolicitud>> GetTouristSosHistoryAsync()
+        {
+            var userId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (!Guid.TryParse(userId, out var turistaId))
+            {
+                return new List<SosSolicitud>();
+            }
+
+            var respuesta = await _supabaseClient.From<SosSolicitud>()
+                                                 .Where(s => s.IdUsuario == turistaId)
+                                                 .Get();
+            return respuesta.Models
+                .OrderByDescending(s => s.Timestamp)
+                .ToList();
+        }
+
+        public async Task SendTouristSosAsync(string grupoId, double latitud, double longitud)
+        {
+            await _supabaseClient.Rpc<string>("registrar_sos_turista", new Dictionary<string, object>
+            {
+                { "p_id_grupo", grupoId },
+                { "p_latitud", latitud },
+                { "p_longitud", longitud }
+            });
         }
 
         public async Task CreateTripAsync(GrupoTour grupo, List<Checkpoint> puntos)
@@ -227,6 +414,26 @@ namespace appTurismo.Services
             return turistas.Where(t => participantIds.Contains(t.Id_usuario)).ToList();
         }
 
+        public async Task<List<ParticipanteViaje>> GetGuideParticipantsAsync(string grupoId)
+        {
+            await EnsureGuideTripAsync(grupoId);
+
+            var asignaciones = await _supabaseClient.From<GrupoParticipante>()
+                                                    .Where(p => p.IdGrupo == grupoId)
+                                                    .Get();
+            var turistas = await GetTouristUsersAsync();
+            var usuariosPorId = turistas.ToDictionary(t => t.Id_usuario);
+
+            return asignaciones.Models
+                .Where(a => usuariosPorId.ContainsKey(a.IdUsuario))
+                .Select(a => new ParticipanteViaje
+                {
+                    Usuario = usuariosPorId[a.IdUsuario],
+                    ConfirmacionAsistencia = a.ConfirmacionAsistencia
+                })
+                .ToList();
+        }
+
         public async Task<List<Models.Supabase.User>> GetAvailableTouristsAsync(string grupoId)
         {
             await EnsureEditableGuideTripAsync(grupoId);
@@ -253,14 +460,14 @@ namespace appTurismo.Services
 
                 if (assignments.Models.Count >= viaje.CupoMaximo.Value)
                 {
-                    throw new InvalidOperationException("El viaje ya alcanzo su cupo maximo.");
+                    throw new InvalidOperationException("El viaje ya alcanzó su cupo máximo.");
                 }
             }
 
             var disponibles = await GetAvailableTouristsAsync(grupoId);
             if (!disponibles.Any(t => t.Id_usuario == turistaId))
             {
-                throw new InvalidOperationException("El turista seleccionado no esta disponible para asignacion.");
+                throw new InvalidOperationException("El turista seleccionado no está disponible para asignación.");
             }
 
             await _supabaseClient.From<GrupoParticipante>().Insert(new GrupoParticipante
@@ -290,6 +497,7 @@ namespace appTurismo.Services
                                                     .Where(p => p.Estado == "Activo")
                                                     .Get();
             var idsActivos = asignaciones.Models.Select(a => a.IdUsuario).ToHashSet();
+            var confirmaciones = asignaciones.Models.ToDictionary(a => a.IdUsuario, a => a.ConfirmacionAsistencia);
             var participantes = (await GetTouristUsersAsync())
                 .Where(t => idsActivos.Contains(t.Id_usuario))
                 .ToList();
@@ -305,7 +513,10 @@ namespace appTurismo.Services
             {
                 Usuario = usuario,
                 Presente = asistenciaPorUsuario.TryGetValue(usuario.Id_usuario, out var presente) && presente,
-                EstadoParticipante = "Activo"
+                EstadoParticipante = "Activo",
+                ConfirmacionAsistencia = confirmaciones.TryGetValue(usuario.Id_usuario, out var confirmacion)
+                    ? confirmacion
+                    : "Pendiente"
             }).ToList();
         }
 
@@ -359,12 +570,12 @@ namespace appTurismo.Services
             var participante = asignacion.Models.FirstOrDefault();
             if (participante == null || !string.Equals(participante.Estado, "Activo", StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException("El turista ya no esta activo dentro del recorrido.");
+                throw new InvalidOperationException("El turista ya no está activo dentro del recorrido.");
             }
 
             if (_supabaseClient.Auth.CurrentSession?.User == null)
             {
-                throw new InvalidOperationException("No hay un guia autenticado.");
+                throw new InvalidOperationException("No hay un guía autenticado.");
             }
 
             await _supabaseClient.Rpc<string>("registrar_incidencia_guia", new Dictionary<string, object>
@@ -431,7 +642,7 @@ namespace appTurismo.Services
         {
             if (_supabaseClient.Auth.CurrentSession?.User == null)
             {
-                throw new InvalidOperationException("No hay un guia autenticado.");
+                throw new InvalidOperationException("No hay un guía autenticado.");
             }
 
             await _supabaseClient.Rpc<object>("actualizar_incidencia_guia", new Dictionary<string, object>
@@ -439,6 +650,53 @@ namespace appTurismo.Services
                 { "p_id_incidencia", incidenciaId },
                 { "p_estado", estado },
                 { "p_nota_resolucion", notaResolucion }
+            });
+        }
+
+        public async Task<List<SosOperacion>> GetActiveGuideSosAsync()
+        {
+            return await GetGuideSosByStatusAsync("Activo");
+        }
+
+        public async Task<List<SosOperacion>> GetResolvedGuideSosAsync()
+        {
+            return await GetGuideSosByStatusAsync("Resuelto");
+        }
+
+        private async Task<List<SosOperacion>> GetGuideSosByStatusAsync(string estado)
+        {
+            var guiaId = _supabaseClient.Auth.CurrentSession?.User?.Id;
+            if (string.IsNullOrWhiteSpace(guiaId))
+            {
+                return new List<SosOperacion>();
+            }
+
+            var solicitudes = await _supabaseClient.From<SosSolicitud>()
+                                                   .Where(s => s.GuiaId == guiaId)
+                                                   .Where(s => s.Estado == estado)
+                                                   .Get();
+            var viajes = (await GetGuideTripsAsync()).ToDictionary(v => v.IdTourGroup, v => v.Nombre);
+            var turistas = (await GetTouristUsersAsync()).ToDictionary(
+                t => t.Id_usuario,
+                t => $"{t.Nombre} {t.Apellido_paterno}".Trim());
+
+            return solicitudes.Models
+                .Where(s => viajes.ContainsKey(s.IdGrupoTour))
+                .OrderByDescending(s => s.Timestamp)
+                .Select(s => new SosOperacion
+                {
+                    Solicitud = s,
+                    NombreViaje = viajes[s.IdGrupoTour],
+                    NombreTurista = turistas.TryGetValue(s.IdUsuario, out var nombre) ? nombre : "Turista"
+                })
+                .ToList();
+        }
+
+        public async Task ResolveGuideSosAsync(string sosId)
+        {
+            await _supabaseClient.Rpc<object>("resolver_sos_guia", new Dictionary<string, object>
+            {
+                { "p_id_sos", sosId }
             });
         }
 
@@ -506,9 +764,9 @@ namespace appTurismo.Services
             await _supabaseClient.From<Grupo>()
                                  .Where(g => g.IdTourGroup == grupo.IdTourGroup)
                                  .Set(g => g.Nombre, grupo.Nombre)
-                                 .Set(g => g.Descripcion, grupo.Descripcion ?? string.Empty)
-                                 .Set(g => g.PuntoEncuentro, grupo.PuntoEncuentro ?? string.Empty)
-                                 .Set(g => g.CupoMaximo, grupo.CupoMaximo ?? 1)
+                                 .Set(g => g.Descripcion!, grupo.Descripcion ?? string.Empty)
+                                 .Set(g => g.PuntoEncuentro!, grupo.PuntoEncuentro ?? string.Empty)
+                                 .Set(g => g.CupoMaximo!, grupo.CupoMaximo ?? 1)
                                  .Set(g => g.FechaInicio, grupo.FechaInicio)
                                  .Update();
 
@@ -581,7 +839,7 @@ namespace appTurismo.Services
 
             if (!string.Equals(viaje.Estado, "Plan", StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException("Los participantes solo pueden modificarse mientras el viaje esta en Plan.");
+                throw new InvalidOperationException("Los participantes solo pueden modificarse mientras el viaje está en Plan.");
             }
 
             return viaje;
@@ -617,7 +875,7 @@ namespace appTurismo.Services
             var viaje = await GetGuideTripAsync(grupoId);
             if (viaje == null)
             {
-                throw new InvalidOperationException("El viaje no pertenece al guia autenticado.");
+                throw new InvalidOperationException("El viaje no pertenece al guía autenticado.");
             }
 
             return viaje;

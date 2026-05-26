@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="appTurismo.Views.PerfilGuiaPage"
+             x:Class="appTurismo.Views.PerfilTuristaPage"
              Title="{Binding Title}">
 
     <ContentPage.ToolbarItems>
@@ -50,7 +50,7 @@
             </Border>
 
             <VerticalStackLayout IsVisible="{Binding EstaConsultando}" Spacing="12">
-                <Label Text="Datos del guía"
+                <Label Text="Datos del turista"
                        FontSize="20"
                        FontAttributes="Bold" />
                 <Border Padding="14" Stroke="#E0E0E0" StrokeThickness="1">
@@ -108,14 +108,14 @@
                    FontSize="20"
                    FontAttributes="Bold"
                    Margin="0,8,0,0" />
-            <Label Text="{Binding TotalViajes, StringFormat='Tienes {0} viajes registrados como guía.'}"
+            <Label Text="{Binding TotalViajes, StringFormat='Tienes {0} viajes asignados.'}"
                    TextColor="#555555" />
 
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="8">
                 <Border Padding="12" BackgroundColor="#FFF8E1" Stroke="#FFE082" StrokeThickness="1">
                     <VerticalStackLayout HorizontalOptions="Center">
-                        <Label Text="{Binding ViajesPlanificados}" FontSize="23" FontAttributes="Bold" TextColor="#F57C00" />
-                        <Label Text="Planificados" TextColor="#555555" />
+                        <Label Text="{Binding ViajesProximos}" FontSize="23" FontAttributes="Bold" TextColor="#F57C00" />
+                        <Label Text="Próximos" TextColor="#555555" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Column="1" Padding="12" BackgroundColor="#E3F2FD" Stroke="#90CAF9" StrokeThickness="1">
@@ -138,6 +138,22 @@
                 </Border>
             </Grid>
 
+            <Label Text="Solicitudes de ayuda"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   Margin="0,8,0,0" />
+            <Border Padding="14" Stroke="#FFCDD2" BackgroundColor="#FFF5F5">
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <VerticalStackLayout HorizontalOptions="Center">
+                        <Label Text="{Binding SosEnviados}" FontSize="23" FontAttributes="Bold" TextColor="#C62828" />
+                        <Label Text="SOS enviados" TextColor="#555555" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center">
+                        <Label Text="{Binding SosAtendidos}" FontSize="23" FontAttributes="Bold" TextColor="#2E7D32" />
+                        <Label Text="Atendidos" TextColor="#555555" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

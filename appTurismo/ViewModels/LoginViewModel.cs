@@ -57,7 +57,7 @@ namespace appTurismo.ViewModels
                 }
                 else if (userRole == "turista")
                 {
-                    await Shell.Current.GoToAsync("//TuristaTabs/UserPage");
+                    await Shell.Current.GoToAsync("//TuristaTabs/CatalogoViajesPage");
                 }
                 else
                 {

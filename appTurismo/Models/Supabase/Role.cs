@@ -11,6 +11,6 @@ namespace appTurismo.Models.Supabase
         public Guid Id_rol { get; set; }
 
         [Column("nombre")]
-        public string Nombre { get; set; }
+        public string Nombre { get; set; } = string.Empty;
     }
 }

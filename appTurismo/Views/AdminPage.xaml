@@ -99,7 +99,7 @@
                         SelectionMode="None">
             <CollectionView.EmptyView>
                 <Border Padding="18" Stroke="#E0E0E0" StrokeThickness="1" BackgroundColor="#FAFAFA">
-                    <Label Text="No hay viajes en esta categoria."
+                    <Label Text="No hay viajes en esta categoría."
                            TextColor="#666666"
                            HorizontalTextAlignment="Center" />
                 </Border>

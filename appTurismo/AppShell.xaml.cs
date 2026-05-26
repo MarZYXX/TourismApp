@@ -16,6 +16,8 @@
             Routing.RegisterRoute("DetalleIncidenciaPage", typeof(Views.DetalleIncidenciaPage));
             Routing.RegisterRoute("DetalleViajeTuristaPage", typeof(Views.DetalleViajeTuristaPage));
             Routing.RegisterRoute("MapaViajeTuristaPage", typeof(Views.MapaViajeTuristaPage));
+            Routing.RegisterRoute("MapaSosPage", typeof(Views.MapaSosPage));
+            Routing.RegisterRoute("DetalleCatalogoViajePage", typeof(Views.DetalleCatalogoViajePage));
         }
     }
 }

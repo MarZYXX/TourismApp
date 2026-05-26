@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+             x:Class="appTurismo.Views.DetalleCatalogoViajePage"
+             Title="{Binding Title}">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <ActivityIndicator IsVisible="{Binding IsBusy}"
+                               IsRunning="{Binding IsBusy}"
+                               Color="#2196F3" />
+
+            <VerticalStackLayout IsVisible="{Binding TieneViaje}" Spacing="16">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <Label Text="{Binding Viaje.Nombre}"
+                           FontSize="27"
+                           FontAttributes="Bold"
+                           TextColor="#1B5E20" />
+                    <Border Grid.Column="1"
+                            Padding="8,5"
+                            BackgroundColor="#E3F2FD"
+                            Stroke="#90CAF9">
+                        <Label Text="{Binding Viaje.CupoTexto}"
+                               FontSize="12"
+                               TextColor="#1565C0"
+                               FontAttributes="Bold" />
+                    </Border>
+                </Grid>
+
+                <Border Padding="15" Stroke="#C8E6C9" StrokeThickness="1" BackgroundColor="#F1F8E9">
+                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" RowSpacing="10" ColumnSpacing="12">
+                        <Label Text="Estado:" FontAttributes="Bold" />
+                        <Label Grid.Column="1" Text="Disponible" TextColor="#2E7D32" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Text="Inicio:" FontAttributes="Bold" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Viaje.FechaInicio, StringFormat='{0:dd/MM/yyyy HH:mm}'}" />
+                        <Label Grid.Row="2" Text="Encuentro:" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Viaje.PuntoEncuentro}" />
+                        <Label Grid.Row="3" Text="Guía:" FontAttributes="Bold" />
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Viaje.NombreGuia}" />
+                    </Grid>
+                </Border>
+
+                <Label Text="Descripción" FontSize="20" FontAttributes="Bold" />
+                <Label Text="{Binding Viaje.Descripcion, TargetNullValue='El guía no agregó una descripción adicional.'}"
+                       TextColor="#555555" />
+
+                <Label Text="Vista previa de la ruta" FontSize="20" FontAttributes="Bold" />
+                <Label Text="Revisa los puntos que visitarás antes de unirte al recorrido."
+                       TextColor="#555555" />
+
+                <Border Stroke="#E0E0E0" StrokeThickness="1" BackgroundColor="#FAFAFA">
+                    <Grid HeightRequest="260">
+                        <mapsui:MapView x:Name="mapPreview" />
+                    </Grid>
+                </Border>
+
+                <Label Text="Checkpoints incluidos" FontSize="20" FontAttributes="Bold" />
+                <CollectionView ItemsSource="{Binding Checkpoints}"
+                                SelectionMode="None"
+                                MaximumHeightRequest="360">
+                    <CollectionView.EmptyView>
+                        <Label Text="Este viaje todavía no tiene checkpoints publicados."
+                               TextColor="#666666" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Padding="12" Margin="0,4" Stroke="#E0E0E0" BackgroundColor="White">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                                    <Border Padding="8,5" Stroke="#90CAF9" BackgroundColor="#E3F2FD">
+                                        <Label Text="{Binding Orden}" FontAttributes="Bold" TextColor="#1565C0" />
+                                    </Border>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Nombre}"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Button Text="Unirme a este viaje"
+                        Command="{Binding InscribirseCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        BackgroundColor="#2E7D32"
+                        TextColor="White"
+                        HeightRequest="54"
+                        Margin="0,8,0,16" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

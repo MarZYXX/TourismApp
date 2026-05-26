@@ -65,6 +65,10 @@
                                 <Label Text="{Binding Usuario.Correo_electronico}"
                                        TextColor="#666666"
                                        FontSize="12" />
+                                <Label Text="{Binding ConfirmacionTexto}"
+                                       TextColor="#1565C0"
+                                       FontSize="12"
+                                       FontAttributes="Bold" />
                                 <Label Text="Ausente"
                                        FontSize="12"
                                        TextColor="#E53935">

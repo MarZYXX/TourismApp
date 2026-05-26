@@ -10,22 +10,28 @@ namespace appTurismo.ViewModels
         private readonly IViajeService _viajeService;
 
         public ObservableCollection<GrupoTour> ViajesEnCurso { get; } = new();
+        public ObservableCollection<SosOperacion> AlertasSos { get; } = new();
+        public ObservableCollection<SosOperacion> HistorialSos { get; } = new();
         public ObservableCollection<IncidenciaOperacion> IncidenciasPendientes { get; } = new();
         public ObservableCollection<IncidenciaOperacion> HistorialIncidencias { get; } = new();
         public ICommand CargarOperacionCommand { get; }
         public ICommand AbrirSeguimientoCommand { get; }
         public ICommand VerDetalleCommand { get; }
         public ICommand VerIncidenciaCommand { get; }
+        public ICommand VerUbicacionSosCommand { get; }
+        public ICommand ResolverSosCommand { get; }
 
         public OperacionGuiaViewModel(IViajeService viajeService, IUserService userService) : base(userService)
         {
             _viajeService = viajeService;
-            Title = "Operacion";
+            Title = "Operación";
 
             CargarOperacionCommand = new Command(async () => await CargarOperacionAsync());
             AbrirSeguimientoCommand = new Command<GrupoTour>(async viaje => await AbrirSeguimientoAsync(viaje));
             VerDetalleCommand = new Command<GrupoTour>(async viaje => await VerDetalleAsync(viaje));
             VerIncidenciaCommand = new Command<IncidenciaOperacion>(async incidencia => await VerIncidenciaAsync(incidencia));
+            VerUbicacionSosCommand = new Command<SosOperacion>(async sos => await VerUbicacionSosAsync(sos));
+            ResolverSosCommand = new Command<SosOperacion>(async sos => await ResolverSosAsync(sos));
         }
 
         private async Task CargarOperacionAsync()
@@ -41,6 +47,17 @@ namespace appTurismo.ViewModels
                 foreach (var viaje in viajes)
                 {
                     ViajesEnCurso.Add(viaje);
+                }
+
+                AlertasSos.Clear();
+                foreach (var sos in await _viajeService.GetActiveGuideSosAsync())
+                {
+                    AlertasSos.Add(sos);
+                }
+                HistorialSos.Clear();
+                foreach (var sos in await _viajeService.GetResolvedGuideSosAsync())
+                {
+                    HistorialSos.Add(sos);
                 }
 
                 var incidencias = await _viajeService.GetGuideIncidentsAsync();
@@ -60,7 +77,7 @@ namespace appTurismo.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error al cargar operacion: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error al cargar operación: {ex.Message}");
                 await Shell.Current.DisplayAlertAsync("Error", "No fue posible consultar los recorridos activos.", "OK");
             }
             finally
@@ -91,6 +108,50 @@ namespace appTurismo.ViewModels
 
             Preferences.Set("IncidenciaSeleccionada", incidencia.Incidencia.IdIncidencia);
             await Shell.Current.GoToAsync("DetalleIncidenciaPage");
+        }
+
+        private static async Task VerUbicacionSosAsync(SosOperacion? sos)
+        {
+            if (sos == null) return;
+
+            Preferences.Set("SosLatitud", sos.Solicitud.Latitud);
+            Preferences.Set("SosLongitud", sos.Solicitud.Longitud);
+            Preferences.Set("SosTurista", sos.NombreTurista);
+            Preferences.Set("SosViaje", sos.NombreViaje);
+            await Shell.Current.GoToAsync("MapaSosPage");
+        }
+
+        private async Task ResolverSosAsync(SosOperacion? sos)
+        {
+            if (sos == null || IsBusy) return;
+
+            var confirmar = await Shell.Current.DisplayAlertAsync(
+                "Resolver SOS",
+                $"Confirmas que la solicitud de {sos.NombreTurista} ya fue atendida?",
+                "Resolver",
+                "Cancelar");
+            if (!confirmar) return;
+
+            try
+            {
+                IsBusy = true;
+                await _viajeService.ResolveGuideSosAsync(sos.Solicitud.IdSos);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error al resolver SOS: {ex.Message}");
+                var mensaje = ex.Message.Contains("resolver_sos_guia", StringComparison.OrdinalIgnoreCase)
+                    ? "Falta ejecutar el script SOS en Supabase."
+                    : "No fue posible resolver la alerta SOS.";
+                await Shell.Current.DisplayAlertAsync("No se pudo resolver", mensaje, "OK");
+                return;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+
+            await CargarOperacionAsync();
         }
     }
 }

@@ -32,36 +32,71 @@
                         <Label Grid.Column="1" Text="{Binding Viaje.FechaInicio, StringFormat='{0:dd/MM/yyyy HH:mm}'}" />
                         <Label Grid.Row="1" Text="Encuentro:" FontAttributes="Bold" />
                         <Label Grid.Row="1" Grid.Column="1" Text="{Binding Viaje.PuntoEncuentro}" />
-                        <Label Grid.Row="2" Text="Guia:" FontAttributes="Bold" />
+                        <Label Grid.Row="2" Text="Guía:" FontAttributes="Bold" />
                         <Label Grid.Row="2" Grid.Column="1" Text="{Binding Viaje.NombreGuia}" />
                         <Label Grid.Row="3" Text="Mi estado:" FontAttributes="Bold" />
                         <Label Grid.Row="3" Grid.Column="1" Text="{Binding Viaje.EstadoParticipacion}" TextColor="#1565C0" FontAttributes="Bold" />
                     </Grid>
                 </Border>
 
-                <Label Text="Descripcion" FontSize="20" FontAttributes="Bold" />
-                <Label Text="{Binding Viaje.Descripcion, TargetNullValue='Sin descripcion adicional.'}"
+                <Label Text="Descripción" FontSize="20" FontAttributes="Bold" />
+                <Label Text="{Binding Viaje.Descripcion, TargetNullValue='Sin descripción adicional.'}"
                        TextColor="#555555" />
 
+                <Label Text="Confirmación de asistencia"
+                       FontSize="20"
+                       FontAttributes="Bold" />
+                <Border Padding="14" Stroke="#90CAF9" BackgroundColor="#E3F2FD">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="{Binding Viaje.ConfirmacionTexto}"
+                               FontAttributes="Bold"
+                               TextColor="#1565C0" />
+                        <Label Text="Informa al guía si participas en este recorrido."
+                               FontSize="12"
+                               TextColor="#555555"
+                               IsVisible="{Binding PuedeConfirmarAsistencia}" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="10"
+                              IsVisible="{Binding PuedeConfirmarAsistencia}">
+                            <Button Text="Confirmar asistencia"
+                                    Command="{Binding ConfirmarAsistenciaCommand}"
+                                    BackgroundColor="#2E7D32"
+                                    TextColor="White" />
+                            <Button Grid.Column="1"
+                                    Text="No asistiré"
+                                    Command="{Binding RechazarAsistenciaCommand}"
+                                    BackgroundColor="#757575"
+                                    TextColor="White" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
                 <Label Text="Ruta y checkpoints" FontSize="20" FontAttributes="Bold" />
-                <Label Text="Estos son los puntos establecidos por el guia para tu recorrido."
+                <Label Text="Estos son los puntos establecidos por el guía para tu recorrido."
                        TextColor="#555555" />
 
                 <Border Stroke="#E0E0E0" StrokeThickness="1" BackgroundColor="#FAFAFA">
-                    <Grid HeightRequest="210">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AbrirRutaCompletaCommand}" />
+                    </Border.GestureRecognizers>
+                    <Grid HeightRequest="210" RowDefinitions="*,Auto">
                         <mapsui:MapView x:Name="mapPreview" InputTransparent="True" />
+                        <Border Grid.Row="1"
+                                Margin="10"
+                                Padding="10,7"
+                                HorizontalOptions="Center"
+                                BackgroundColor="#E65100"
+                                StrokeThickness="0">
+                            <Label Text="Toca para ampliar el mapa"
+                                   TextColor="White"
+                                   FontAttributes="Bold" />
+                        </Border>
                     </Grid>
                 </Border>
-                <Button Text="Ver ruta completa"
-                        Command="{Binding AbrirRutaCompletaCommand}"
-                        BackgroundColor="#FF9800"
-                        TextColor="White" />
-
                 <CollectionView ItemsSource="{Binding Checkpoints}"
                                 SelectionMode="None"
                                 MaximumHeightRequest="420">
                     <CollectionView.EmptyView>
-                        <Label Text="Todavia no hay checkpoints publicados para este viaje."
+                        <Label Text="Todavía no hay checkpoints publicados para este viaje."
                                TextColor="#666666" />
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>

@@ -13,7 +13,7 @@
             <Label Text="Mi recorrido en marcha"
                    FontSize="26"
                    FontAttributes="Bold" />
-            <Label Text="Consulta la ruta y el avance registrado por tu guia."
+            <Label Text="Consulta la ruta y el avance registrado por tu guía."
                    FontSize="14"
                    TextColor="#555555" />
             <ActivityIndicator IsVisible="{Binding IsBusy}"
@@ -29,7 +29,7 @@
                         <Label Text="No tienes recorridos activos."
                                FontSize="18"
                                FontAttributes="Bold" />
-                        <Label Text="Cuando el guia inicie uno de tus viajes, aparecera aqui."
+                        <Label Text="Cuando el guía inicie uno de tus viajes, aparecerá aquí."
                                TextColor="#666666" />
                     </VerticalStackLayout>
                 </Border>
@@ -48,16 +48,53 @@
                                        TextColor="#2E7D32"
                                        VerticalOptions="Center" />
                             </Grid>
-                            <Label Text="{Binding NombreGuia, StringFormat='Guia: {0}'}" />
+                            <Label Text="{Binding NombreGuia, StringFormat='Guía: {0}'}" />
                             <Label Text="{Binding PuntoEncuentro, StringFormat='Encuentro: {0}'}"
                                    TextColor="#555555" />
-                            <Label Text="{Binding EstadoParticipacion, StringFormat='Mi participacion: {0}'}"
+                            <Label Text="{Binding EstadoParticipacion, StringFormat='Mi participación: {0}'}"
                                    FontAttributes="Bold"
                                    TextColor="#1565C0" />
+                            <Label Text="{Binding ConfirmacionTexto, StringFormat='Asistencia: {0}'}"
+                                   FontAttributes="Bold"
+                                   TextColor="#2E7D32" />
                             <Border Padding="10" Stroke="#90CAF9" BackgroundColor="#E3F2FD">
                                 <Label Text="{Binding ProgresoTexto}"
                                        TextColor="#1565C0"
                                        FontAttributes="Bold" />
+                            </Border>
+                            <Border Padding="12" Stroke="#EF9A9A" BackgroundColor="#FFEBEE">
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="Emergencia"
+                                           FontAttributes="Bold"
+                                           TextColor="#C62828" />
+                                    <Label Text="{Binding SosEstadoTexto}"
+                                           FontSize="12"
+                                           TextColor="#555555" />
+                                    <Label Text="SOS activo: espera contacto de tu guía."
+                                           IsVisible="{Binding TieneSosActivo}"
+                                           FontAttributes="Bold"
+                                           TextColor="#C62828" />
+                                    <Button Text="SOS / Necesito ayuda"
+                                            IsVisible="{Binding PuedeEnviarSos}"
+                                            IsEnabled="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.IsNotBusy}"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EnviarSosCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#D32F2F"
+                                            TextColor="White" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Padding="10"
+                                    Stroke="#A5D6A7"
+                                    BackgroundColor="#E8F5E9"
+                                    IsVisible="{Binding TieneSosResuelto}">
+                                <VerticalStackLayout Spacing="3">
+                                    <Label Text="Ultimo SOS atendido"
+                                           FontAttributes="Bold"
+                                           TextColor="#2E7D32" />
+                                    <Label Text="{Binding UltimoSosResueltoTexto, StringFormat='Resuelto por el guía. Solicitud enviada: {0}'}"
+                                           FontSize="12"
+                                           TextColor="#555555" />
+                                </VerticalStackLayout>
                             </Border>
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
                                 <Button Text="Abrir ruta"

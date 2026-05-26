@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+             x:Class="appTurismo.Views.MapaSosPage"
+             Title="Ubicación SOS">
+
+    <Grid RowDefinitions="*,Auto">
+        <mapsui:MapView x:Name="mapView" />
+
+        <Border Grid.Row="1"
+                Padding="14"
+                Stroke="#EF9A9A"
+                BackgroundColor="#FFEBEE">
+            <VerticalStackLayout Spacing="7">
+                <Label Text="Ubicación reportada por el turista"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#C62828" />
+                <Label x:Name="turistaLabel" />
+                <Label x:Name="viajeLabel" />
+                <Label x:Name="coordenadasLabel"
+                       FontSize="12"
+                       TextColor="#555555" />
+                <Label Text="Acude al punto indicado y resuelve la alerta desde Operación cuando el turista esté atendido."
+                       FontSize="12"
+                       TextColor="#555555" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

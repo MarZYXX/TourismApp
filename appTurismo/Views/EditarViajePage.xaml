@@ -15,19 +15,19 @@
                 <Label Text="Editar viaje planificado"
                        FontSize="26"
                        FontAttributes="Bold" />
-                <Label Text="Puedes ajustar la programacion y la ruta antes de iniciar el recorrido."
+                <Label Text="Puedes ajustar la programación y la ruta antes de iniciar el recorrido."
                        TextColor="#555555" />
 
-                <Label Text="Informacion general" FontSize="19" FontAttributes="Bold" />
+                <Label Text="Información general" FontSize="19" FontAttributes="Bold" />
                 <Entry Placeholder="Nombre del viaje" Text="{Binding Nombre}" />
-                <Editor Placeholder="Descripcion e indicaciones"
+                <Editor Placeholder="Descripción e indicaciones"
                         Text="{Binding Descripcion}"
                         AutoSize="TextChanges"
                         MinimumHeightRequest="90" />
                 <Entry Placeholder="Punto de encuentro" Text="{Binding PuntoEncuentro}" />
-                <Entry Placeholder="Cupo maximo" Text="{Binding CupoMaximo}" Keyboard="Numeric" />
+                <Entry Placeholder="Cupo máximo" Text="{Binding CupoMaximo}" Keyboard="Numeric" />
 
-                <Label Text="Programacion" FontSize="19" FontAttributes="Bold" Margin="0,8,0,0" />
+                <Label Text="Programación" FontSize="19" FontAttributes="Bold" Margin="0,8,0,0" />
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                     <VerticalStackLayout Spacing="4">
                         <Label Text="Fecha de inicio" FontSize="13" TextColor="#555555" />

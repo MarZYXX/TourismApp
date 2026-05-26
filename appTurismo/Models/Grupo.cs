@@ -9,7 +9,7 @@ namespace appTurismo.Models
     public class Grupo : BaseModel
     {
         [PrimaryKey("id_tour_group", true)]
-        public string IdTourGroup { get; set; }
+        public string IdTourGroup { get; set; } = string.Empty;
 
         [Column("nombre")]
         public string Nombre { get; set; } = string.Empty;

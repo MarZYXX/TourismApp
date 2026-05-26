@@ -21,7 +21,7 @@
                 <Border Padding="10" BackgroundColor="#FFF8E1" Stroke="#FFE082" StrokeThickness="1">
                     <VerticalStackLayout HorizontalOptions="Center">
                         <Label Text="{Binding TotalProximos}" FontSize="22" FontAttributes="Bold" TextColor="#F57C00" />
-                        <Label Text="Proximos" FontSize="11" TextColor="#555555" />
+                        <Label Text="Próximos" FontSize="11" TextColor="#555555" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Column="1" Padding="10" BackgroundColor="#E3F2FD" Stroke="#90CAF9" StrokeThickness="1">
@@ -42,7 +42,7 @@
                 <HorizontalStackLayout Spacing="8">
                     <Button Text="Todos" Command="{Binding FiltrarCommand}" CommandParameter="Todos"
                             BackgroundColor="#455A64" TextColor="White" />
-                    <Button Text="Proximos" Command="{Binding FiltrarCommand}" CommandParameter="Plan"
+                    <Button Text="Próximos" Command="{Binding FiltrarCommand}" CommandParameter="Plan"
                             BackgroundColor="#FFB300" TextColor="White" />
                     <Button Text="En curso" Command="{Binding FiltrarCommand}" CommandParameter="Activo"
                             BackgroundColor="#1976D2" TextColor="White" />
@@ -62,7 +62,7 @@
         <CollectionView Grid.Row="1" ItemsSource="{Binding ViajesFiltrados}" SelectionMode="None">
             <CollectionView.EmptyView>
                 <Border Padding="18" Stroke="#E0E0E0" BackgroundColor="#FAFAFA">
-                    <Label Text="No tienes viajes asignados en esta categoria."
+                    <Label Text="No tienes viajes asignados en esta categoría."
                            TextColor="#666666"
                            HorizontalTextAlignment="Center" />
                 </Border>
@@ -89,9 +89,13 @@
                             </Grid>
                             <Label Text="{Binding FechaInicio, StringFormat='Inicio: {0:dd/MM/yyyy HH:mm}'}" TextColor="#555555" />
                             <Label Text="{Binding PuntoEncuentro, StringFormat='Encuentro: {0}'}" TextColor="#555555" />
-                            <Label Text="{Binding NombreGuia, StringFormat='Guia: {0}'}" TextColor="#555555" />
-                            <Label Text="{Binding EstadoParticipacion, StringFormat='Mi participacion: {0}'}"
+                            <Label Text="{Binding NombreGuia, StringFormat='Guía: {0}'}" TextColor="#555555" />
+                            <Label Text="{Binding EstadoParticipacion, StringFormat='Mi participación: {0}'}"
                                    FontSize="12" TextColor="#1565C0" />
+                            <Label Text="{Binding ConfirmacionTexto, StringFormat='Asistencia: {0}'}"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   TextColor="#2E7D32" />
                             <Button Text="Ver detalle"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.VerDetalleCommand}"
                                     CommandParameter="{Binding .}"

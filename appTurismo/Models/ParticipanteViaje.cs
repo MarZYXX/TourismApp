@@ -1,20 +1,20 @@
 namespace appTurismo.Models
 {
-    public class RegistroAsistencia
+    public class ParticipanteViaje
     {
         public Models.Supabase.User Usuario { get; set; } = new();
-        public bool Presente { get; set; }
-        public string EstadoParticipante { get; set; } = "Activo";
         public string ConfirmacionAsistencia { get; set; } = "Pendiente";
 
         public string NombreCompleto =>
             $"{Usuario.Nombre} {Usuario.Apellido_paterno}".Trim();
 
+        public string CorreoElectronico => Usuario.Correo_electronico;
+
         public string ConfirmacionTexto => ConfirmacionAsistencia switch
         {
-            "Confirmado" => "Confirmo asistencia",
-            "No_asistira" => "Indicó que no asistirá",
-            _ => "Sin confirmar"
+            "Confirmado" => "Confirmado",
+            "No_asistira" => "No asistirá",
+            _ => "Pendiente"
         };
     }
 }

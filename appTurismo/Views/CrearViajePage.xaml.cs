@@ -58,7 +58,7 @@ public partial class CrearViajePage : ContentPage
     }
 
     // ¡NUEVA FUNCIÓN! Agrega el punto exactamente donde está el centro de la pantalla
-    private void BtnAgregarCentro_Clicked(object sender, EventArgs e)
+    private void BtnAgregarCentro_Clicked(object? sender, EventArgs e)
     {
         // 1. Leemos exactamente dónde está centrada la cámara del mapa en este instante
         var centroX = mapView.Map.Navigator.Viewport.CenterX;

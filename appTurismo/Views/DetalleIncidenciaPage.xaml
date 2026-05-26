@@ -30,7 +30,7 @@
                                FontAttributes="Bold"
                                TextColor="#F57C00" />
                     </Grid>
-                    <Label Text="Requiere atencion prioritaria"
+                    <Label Text="Requiere atención prioritaria"
                            IsVisible="{Binding Incidencia.EsPrioritaria}"
                            FontAttributes="Bold"
                            TextColor="#C62828" />
@@ -43,17 +43,17 @@
             </Border>
 
             <VerticalStackLayout Spacing="6">
-                <Label Text="Descripcion reportada"
+                <Label Text="Descripción reportada"
                        FontAttributes="Bold" />
-                <Label Text="{Binding Incidencia.Incidencia.Descripcion, TargetNullValue='Sin descripcion adicional.'}"
+                <Label Text="{Binding Incidencia.Incidencia.Descripcion, TargetNullValue='Sin descripción adicional.'}"
                        TextColor="#555555" />
             </VerticalStackLayout>
 
             <VerticalStackLayout Spacing="6">
-                <Label Text="Nota de atencion o resolucion"
+                <Label Text="Nota de atención o resolución"
                        FontAttributes="Bold" />
                 <Editor Text="{Binding NotaResolucion}"
-                        Placeholder="Ejemplo: Se acompano al turista al punto de encuentro."
+                        Placeholder="Ejemplo: Se acompañó al turista al punto de encuentro."
                         AutoSize="TextChanges"
                         MinimumHeightRequest="100"
                         IsEnabled="{Binding PuedeCerrar}" />

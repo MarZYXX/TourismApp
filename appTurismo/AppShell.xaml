@@ -35,6 +35,11 @@
 
     <TabBar Route="TuristaTabs">
         <ShellContent
+            Title="Explorar"
+            Route="CatalogoViajesPage"
+            ContentTemplate="{DataTemplate views:CatalogoViajesPage}" />
+
+        <ShellContent
             Title="Mis Viajes"
             Route="UserPage"
             ContentTemplate="{DataTemplate views:UserPage}" />
@@ -43,6 +48,11 @@
             Title="Operaci&#243;n"
             Route="OperacionTuristaPage"
             ContentTemplate="{DataTemplate views:OperacionTuristaPage}" />
+
+        <ShellContent
+            Title="Perfil"
+            Route="PerfilTuristaPage"
+            ContentTemplate="{DataTemplate views:PerfilTuristaPage}" />
     </TabBar>
 
 </Shell>
