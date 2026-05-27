@@ -1,6 +1,3 @@
--- Ejecuta este archivo completo en Supabase SQL Editor.
--- Permite que un turista se inscriba por sí mismo en un viaje disponible.
-
 create or replace function public.inscribirse_viaje_turista(
   p_id_grupo uuid
 ) returns void language plpgsql security definer set search_path = public as $rpc$

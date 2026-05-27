@@ -92,7 +92,6 @@ public partial class MapaPage : ContentPage
         }
         catch (Exception)
         {
-            // The route remains usable when location access is unavailable.
         }
     }
 }

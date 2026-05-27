@@ -2,7 +2,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System.Threading.Tasks;
-using Microsoft.Maui.Networking; // Actualizado para MAUI
+using Microsoft.Maui.Networking;
+using appTurismo.Helpers;
 
 namespace appTurismo.ViewModels
 {
@@ -35,6 +36,12 @@ namespace appTurismo.ViewModels
                 return;
             }
 
+            if (!FormValidators.IsValidEmail(Email))
+            {
+                await Shell.Current.DisplayAlertAsync("Correo inválido", "Ingresa un correo válido, por ejemplo usuario@correo.com.", "OK");
+                return;
+            }
+
             if (_connectivity.NetworkAccess != NetworkAccess.Internet)
             {
                 await Shell.Current.DisplayAlertAsync("Sin Conexión", "Revisa tu conexión a internet.", "OK");
@@ -43,12 +50,10 @@ namespace appTurismo.ViewModels
 
             IsBusy = true;
 
-            // AQUÍ ESTABA EL ERROR: Ahora guardamos el texto del rol ("guia" o "turista")
-            string? userRole = await _userService.LoginAsync(Email, Password);
+            string? userRole = await _userService.LoginAsync(Email.Trim(), Password);
 
             IsBusy = false;
 
-            // Si el rol NO está vacío, significa que el login fue exitoso
             if (!string.IsNullOrEmpty(userRole))
             {
                 if (userRole == "guia")

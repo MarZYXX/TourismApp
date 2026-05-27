@@ -18,7 +18,6 @@ namespace appTurismo.ViewModels
             _userService = userService;
             _connectivity = connectivity;
 
-            // REMOVED: GetUsersCommand.Execute(null); to prevent initialization database query crashes
         }
 
         [ObservableProperty]

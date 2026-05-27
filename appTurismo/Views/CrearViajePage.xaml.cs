@@ -26,13 +26,11 @@ public partial class CrearViajePage : ContentPage
         if (mapView.Map == null)
         {
             mapView.Map = new Mapsui.Map();
-            // ¡Ya no conectamos MapClicked, ahora usamos el botón!
         }
 
         mapView.Map.Layers.Clear();
         mapView.Map.Layers.Add(Mapsui.Tiling.OpenStreetMap.CreateTileLayer());
 
-        // Activamos tu GPS para centrar el mapa al abrir la pantalla
         try
         {
             var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
@@ -57,24 +55,19 @@ public partial class CrearViajePage : ContentPage
         mapView.Refresh();
     }
 
-    // ¡NUEVA FUNCIÓN! Agrega el punto exactamente donde está el centro de la pantalla
     private void BtnAgregarCentro_Clicked(object? sender, EventArgs e)
     {
-        // 1. Leemos exactamente dónde está centrada la cámara del mapa en este instante
         var centroX = mapView.Map.Navigator.Viewport.CenterX;
         var centroY = mapView.Map.Navigator.Viewport.CenterY;
 
-        // 2. Lo convertimos a Coordenadas GPS (Latitud/Longitud) desempaquetando directamente
         var (longitud, latitud) = SphericalMercator.ToLonLat(centroX, centroY);
 
-        // 3. Lógica para el "Inicio de Ruta" que pediste
         string nombrePunto;
         if (_contadorPuntos == 1)
             nombrePunto = "Inicio de Ruta";
         else
             nombrePunto = $"Punto {_contadorPuntos}";
 
-        // 4. Dibujamos el Pin rojo para que el Guía vea que sí se agregó
         var nuevoPin = new Pin(mapView)
         {
             Label = nombrePunto,
@@ -86,7 +79,6 @@ public partial class CrearViajePage : ContentPage
         mapView.Pins.Add(nuevoPin);
         mapView.Refresh();
 
-        // 5. Lo guardamos en la memoria para que se envíe a Supabase al darle Guardar
         _viewModel.CheckpointsNuevos.Add(new Checkpoint
         {
             Nombre = nombrePunto,
@@ -97,7 +89,6 @@ public partial class CrearViajePage : ContentPage
 
         _contadorPuntos++;
 
-        // Un mensajito opcional para confirmar
         _ = DisplayAlertAsync("Éxito", $"'{nombrePunto}' agregado a la ruta.", "OK");
     }
 

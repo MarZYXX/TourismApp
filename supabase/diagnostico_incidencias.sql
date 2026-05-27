@@ -1,7 +1,3 @@
--- Diagnostico de incidencias del guia.
--- Es de solo lectura: puede ejecutarse en Supabase SQL Editor sin modificar datos.
-
--- 1. Verifica que RLS y sus politicas existan en la tabla de incidencias.
 select tablename, rowsecurity
 from pg_tables
 where schemaname = 'public'
@@ -13,7 +9,6 @@ where schemaname = 'public'
   and tablename in ('incidencias_participante', 'grupo_participantes')
 order by tablename, policyname;
 
--- 2. Verifica que la app pueda invocar las funciones seguras.
 select
   p.proname as funcion,
   pg_get_function_identity_arguments(p.oid) as parametros,
@@ -25,8 +20,6 @@ where n.nspname = 'public'
   and p.proname in ('registrar_incidencia_guia', 'actualizar_incidencia_guia', 'cerrar_incidencia_guia')
 order by p.proname;
 
--- 3. Muestra los datos relacionados que deben coincidir al registrar.
--- El recorrido debe tener estado Activo y el participante estado Activo.
 select
   g.id_tour_group,
   g.nombre as viaje,
@@ -45,7 +38,6 @@ left join public.usuarios turista on turista.id_usuario = gp.id_usuario
 left join public.checkpoints c on c.id_grupo = g.id_tour_group
 order by g.created_at desc, turista.correo_electronico, c.orden;
 
--- 4. Si ya hubiera incidencias, comprueba los registros guardados.
 select
   id_incidencia,
   id_grupo,

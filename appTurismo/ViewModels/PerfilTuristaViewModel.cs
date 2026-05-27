@@ -1,5 +1,6 @@
 using System.Windows.Input;
 using appTurismo.Services;
+using appTurismo.Helpers;
 
 namespace appTurismo.ViewModels
 {
@@ -137,6 +138,20 @@ namespace appTurismo.ViewModels
             if (string.IsNullOrWhiteSpace(Nombre) || string.IsNullOrWhiteSpace(ApellidoPaterno))
             {
                 await Shell.Current.DisplayAlertAsync("Datos incompletos", "El nombre y apellido paterno son obligatorios.", "OK");
+                return;
+            }
+
+            if (!FormValidators.IsValidName(Nombre) ||
+                !FormValidators.IsValidName(ApellidoPaterno) ||
+                !FormValidators.IsValidName(ApellidoMaterno, required: false))
+            {
+                await Shell.Current.DisplayAlertAsync("Nombre inválido", "Nombre y apellidos solo pueden incluir letras, espacios, guion o apóstrofo.", "OK");
+                return;
+            }
+
+            if (!FormValidators.IsValidPhone(Telefono))
+            {
+                await Shell.Current.DisplayAlertAsync("Teléfono inválido", "Ingresa exactamente 10 dígitos, sin espacios ni guiones.", "OK");
                 return;
             }
 

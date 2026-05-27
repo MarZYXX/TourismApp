@@ -26,7 +26,22 @@
                Margin="0,0,0,18" />
 
         <Entry Placeholder="Correo electrónico" Text="{Binding Email}" Keyboard="Email" HeightRequest="50"/>
-        <Entry Placeholder="Contraseña" Text="{Binding Password}" IsPassword="True" HeightRequest="50"/>
+        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+            <Entry x:Name="PasswordEntry"
+                   Placeholder="Contraseña"
+                   Text="{Binding Password}"
+                   IsPassword="True"
+                   HeightRequest="50" />
+            <ImageButton x:Name="TogglePasswordButton"
+                         Grid.Column="1"
+                         Source="eye.svg"
+                         Clicked="TogglePassword_Clicked"
+                         BackgroundColor="Transparent"
+                         WidthRequest="46"
+                         HeightRequest="50"
+                         Padding="10"
+                         SemanticProperties.Description="Mostrar contraseña" />
+        </Grid>
 
         <Button Text="Ingresar" Command="{Binding LoginCommand}" IsEnabled="{Binding IsNotBusy}" Margin="0,15,0,0" HeightRequest="50"/>
 

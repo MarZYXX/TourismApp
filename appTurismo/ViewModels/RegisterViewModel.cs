@@ -1,6 +1,7 @@
 ﻿using appTurismo.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using appTurismo.Helpers;
 
 namespace appTurismo.ViewModels
 {
@@ -19,9 +20,8 @@ namespace appTurismo.ViewModels
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(TuristaButtonColor))]
         [NotifyPropertyChangedFor(nameof(GuiaButtonColor))]
-        private string _selectedRole = "turista"; // Natively lowercase matching the table rules
+        private string _selectedRole = "turista";
 
-        // C# directly serves standard MAUI color string names back to the XAML binding tree
         public string TuristaButtonColor => SelectedRole == "turista" ? "DarkCyan" : "LightGray";
         public string GuiaButtonColor => SelectedRole == "guia" ? "DarkCyan" : "LightGray";
 
@@ -49,9 +49,37 @@ namespace appTurismo.ViewModels
         {
             if (IsBusy) return;
 
-            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(Nombre))
+            if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password) ||
+                string.IsNullOrWhiteSpace(Nombre) || string.IsNullOrWhiteSpace(ApellidoPaterno) ||
+                string.IsNullOrWhiteSpace(Telefono))
             {
-                await Shell.Current.DisplayAlertAsync("Faltan datos", "Correo, contraseña y nombre son obligatorios.", "OK");
+                await Shell.Current.DisplayAlertAsync("Faltan datos", "Nombre, apellido paterno, teléfono, correo y contraseña son obligatorios.", "OK");
+                return;
+            }
+
+            if (!FormValidators.IsValidEmail(Email))
+            {
+                await Shell.Current.DisplayAlertAsync("Correo inválido", "Ingresa un correo válido, por ejemplo usuario@correo.com.", "OK");
+                return;
+            }
+
+            if (!FormValidators.IsValidPassword(Password))
+            {
+                await Shell.Current.DisplayAlertAsync("Contraseña inválida", "La contraseña debe tener al menos 6 caracteres.", "OK");
+                return;
+            }
+
+            if (!FormValidators.IsValidPhone(Telefono))
+            {
+                await Shell.Current.DisplayAlertAsync("Teléfono inválido", "Ingresa exactamente 10 dígitos, sin espacios ni guiones.", "OK");
+                return;
+            }
+
+            if (!FormValidators.IsValidName(Nombre) ||
+                !FormValidators.IsValidName(ApellidoPaterno) ||
+                !FormValidators.IsValidName(ApellidoMaterno, required: false))
+            {
+                await Shell.Current.DisplayAlertAsync("Nombre inválido", "Nombre y apellidos solo pueden incluir letras, espacios, guion o apóstrofo.", "OK");
                 return;
             }
 
@@ -63,29 +91,21 @@ namespace appTurismo.ViewModels
 
             IsBusy = true;
 
-            // Preparamos el modelo
             var nuevoUsuario = new Models.Supabase.User
             {
-                Nombre = Nombre,
-                Apellido_paterno = ApellidoPaterno,
-                Apellido_materno = ApellidoMaterno,
-                Telefono = Telefono,
-                Correo_electronico = Email
+                Nombre = Nombre.Trim(),
+                Apellido_paterno = ApellidoPaterno.Trim(),
+                Apellido_materno = ApellidoMaterno.Trim(),
+                Telefono = Telefono.Trim(),
+                Correo_electronico = Email.Trim()
             };
 
-            // Llamamos al servicio con la lógica de tu compañero
-            bool success = await _userService.RegisterWithRoleAsync(Email, Password, nuevoUsuario, SelectedRole);
+            bool success = await _userService.RegisterWithRoleAsync(Email.Trim(), Password, nuevoUsuario, SelectedRole);
             IsBusy = false;
 
             if (success)
             {
-                // ÉXITO: Dependiendo de tu lógica, puedes enviarlo al Login o loguearlo automáticamente
                 await Shell.Current.DisplayAlertAsync("¡Bienvenido!", "Registro exitoso.", "OK");
-
-                // Si quieres que el usuario entre directamente sin volver a escribir su pass:
-                // await Shell.Current.GoToAsync("//MainPage"); 
-
-                // Si prefieres que se loguee manualmente:
                 await Shell.Current.GoToAsync("//LoginPage");
             }
             else

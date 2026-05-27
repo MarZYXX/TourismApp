@@ -1,6 +1,3 @@
--- Ejecuta este archivo completo en Supabase SQL Editor para habilitar el
--- envio SOS del turista y la atencion de alertas por el guia.
-
 alter table public.sos enable row level security;
 
 drop policy if exists "Turistas consultan sus solicitudes SOS" on public.sos;

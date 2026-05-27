@@ -6,7 +6,7 @@
              Title="{Binding Title}">
 
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Salir" Command="{Binding CerrarSesionCommand}" Order="Primary" />
+        <ToolbarItem Text="Cerrar sesión" IconImageSource="logout.svg" Command="{Binding CerrarSesionCommand}" Order="Primary" />
     </ContentPage.ToolbarItems>
 
     <ScrollView>

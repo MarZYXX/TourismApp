@@ -19,16 +19,19 @@
     <TabBar Route="GuiaTabs">
         <ShellContent
             Title="Mis Viajes"
+            Icon="trips.svg"
             Route="AdminPage"
             ContentTemplate="{DataTemplate views:AdminPage}" />
 
         <ShellContent
             Title="Operación"
+            Icon="operation.svg"
             Route="OperacionGuiaPage"
             ContentTemplate="{DataTemplate views:OperacionGuiaPage}" />
 
         <ShellContent
             Title="Perfil"
+            Icon="profile.svg"
             Route="PerfilGuiaPage"
             ContentTemplate="{DataTemplate views:PerfilGuiaPage}" />
     </TabBar>
@@ -36,21 +39,25 @@
     <TabBar Route="TuristaTabs">
         <ShellContent
             Title="Explorar"
+            Icon="explore.svg"
             Route="CatalogoViajesPage"
             ContentTemplate="{DataTemplate views:CatalogoViajesPage}" />
 
         <ShellContent
             Title="Mis Viajes"
+            Icon="trips.svg"
             Route="UserPage"
             ContentTemplate="{DataTemplate views:UserPage}" />
 
         <ShellContent
             Title="Operaci&#243;n"
+            Icon="operation.svg"
             Route="OperacionTuristaPage"
             ContentTemplate="{DataTemplate views:OperacionTuristaPage}" />
 
         <ShellContent
             Title="Perfil"
+            Icon="profile.svg"
             Route="PerfilTuristaPage"
             ContentTemplate="{DataTemplate views:PerfilTuristaPage}" />
     </TabBar>

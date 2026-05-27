@@ -127,7 +127,6 @@ namespace appTurismo.ViewModels
             }
             catch
             {
-                // La incidencia se registra aunque no haya ubicacion disponible.
             }
 
             try

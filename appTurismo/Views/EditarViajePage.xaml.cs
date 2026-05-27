@@ -103,7 +103,6 @@ public partial class EditarViajePage : ContentPage
         }
         catch
         {
-            // El trazador sigue disponible si no hay ubicacion.
         }
     }
 }

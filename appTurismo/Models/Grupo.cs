@@ -4,7 +4,6 @@ using System;
 
 namespace appTurismo.Models
 {
-    // Le decimos exactamente cómo se llama la tabla en Supabase
     [Table("grupos")]
     public class Grupo : BaseModel
     {

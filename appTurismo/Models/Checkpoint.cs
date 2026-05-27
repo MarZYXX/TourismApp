@@ -6,7 +6,6 @@ namespace appTurismo.Models
     [Table("checkpoints")]
     public class Checkpoint : BaseModel
     {
-        // En Supabase la llave primaria se llama id_checkpoint
         [PrimaryKey("id_checkpoint", true)]
         public string IdCheckpoint { get; set; } = string.Empty;
 

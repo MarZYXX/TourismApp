@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using appTurismo.Models;
-using appTurismo.Services; // Asumimos que tienes un servicio o lo leeremos directo de Supabase
+using appTurismo.Services;
 
 namespace appTurismo.ViewModels
 {
@@ -42,13 +42,11 @@ namespace appTurismo.ViewModels
             Title = "Control de Checkpoints";
             ListaCheckpoints = new ObservableCollection<Checkpoint>();
 
-            // Comando para cambiar el estado del checkpoint en Supabase
             MarcarCompletadoCommand = new Command<Checkpoint>(async (cp) => await CompletarCheckpoint(cp));
             AbrirAsistenciaCommand = new Command<Checkpoint>(async cp => await AbrirAsistenciaAsync(cp));
             FinalizarRecorridoCommand = new Command(async () => await FinalizarRecorridoAsync());
         }
 
-        // Esta función se llamará cuando la pantalla se abra para cargar los puntos de ese viaje específico
         public async Task CargarCheckpoints(string grupoId)
         {
             if (string.IsNullOrEmpty(grupoId)) return;
@@ -60,7 +58,6 @@ namespace appTurismo.ViewModels
                 var viaje = await _viajeService.GetGuideTripAsync(_grupoId);
                 EsRecorridoActivo = string.Equals(viaje?.Estado, "Activo", System.StringComparison.OrdinalIgnoreCase);
 
-                // Vamos a la nube y traemos solo los puntos de ESTE viaje ordenados por número
                 var respuesta = await _supabaseClient.From<Checkpoint>()
                                                      .Where(c => c.IdGrupo == _grupoId)
                                                      .Order(c => c.Orden, Supabase.Postgrest.Constants.Ordering.Ascending)
@@ -98,23 +95,21 @@ namespace appTurismo.ViewModels
                 return;
             }
 
-            cp.Completado = true; // Lo marcamos a nivel local para que la UI cambie de color
+            cp.Completado = true;
 
             try
             {
-                // Le decimos a Supabase que actualice solo este punto
                 await _supabaseClient.From<Checkpoint>()
                                      .Where(x => x.IdCheckpoint == cp.IdCheckpoint)
                                      .Set(x => x.Completado, true)
                                      .Update();
 
-                // Refrescamos la lista para que el cambio se note en pantalla
                 await CargarCheckpoints(_grupoId);
             }
             catch (System.Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Error al actualizar: {ex.Message}");
-                cp.Completado = false; // Revertimos si hay error
+                cp.Completado = false;
             }
         }
 

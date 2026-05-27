@@ -14,7 +14,6 @@ public partial class MainPage : ContentPage
     {
         base.OnAppearing();
 
-        // Safely pull fresh data when user enters or navigates back to this page layout context
         if (BindingContext is MainViewModel vm)
         {
             if (vm.GetUsersCommand.CanExecute(null))

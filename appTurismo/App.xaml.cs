@@ -25,7 +25,6 @@ namespace appTurismo
 
             try
             {
-                // Safely handle initialization in a non-blocking background routine
                 await _supabaseClient.InitializeAsync();
 
                 if (_supabaseClient.Auth.CurrentSession != null)

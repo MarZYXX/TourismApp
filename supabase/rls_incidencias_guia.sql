@@ -1,7 +1,3 @@
--- Ejecuta los tres bloques completos, uno por uno, en Supabase SQL Editor.
--- No ejecutes una seleccion parcial dentro de una funcion.
-
--- BLOQUE 1: lectura de incidencias propias del guia.
 alter table public.incidencias_participante
   add column if not exists nota_resolucion text,
   add column if not exists atendida_at timestamp with time zone,
@@ -20,7 +16,6 @@ create policy "Guias consultan incidencias de sus viajes"
   on public.incidencias_participante for select to authenticated
   using (id_guia = auth.uid());
 
--- BLOQUE 2: registrar incidencia y, opcionalmente, retirar participante.
 create or replace function public.registrar_incidencia_guia(
   p_id_grupo uuid, p_id_usuario uuid, p_id_checkpoint uuid, p_tipo text,
   p_descripcion text, p_requiere_atencion boolean, p_latitud double precision,
@@ -67,7 +62,6 @@ grant execute on function public.registrar_incidencia_guia(
   uuid, uuid, uuid, text, text, boolean, double precision, double precision, boolean
 ) to authenticated;
 
--- BLOQUE 3: atender o cerrar incidencias desde Operacion.
 create or replace function public.actualizar_incidencia_guia(
   p_id_incidencia uuid, p_estado text, p_nota_resolucion text
 ) returns void language plpgsql security definer set search_path = public as $rpc$
@@ -102,7 +96,6 @@ $rpc$;
 revoke all on function public.actualizar_incidencia_guia(uuid, text, text) from public;
 grant execute on function public.actualizar_incidencia_guia(uuid, text, text) to authenticated;
 
--- Compatibilidad con versiones anteriores que solo cerraban la incidencia.
 create or replace function public.cerrar_incidencia_guia(p_id_incidencia uuid)
 returns void language plpgsql security definer set search_path = public as $rpc$
 begin

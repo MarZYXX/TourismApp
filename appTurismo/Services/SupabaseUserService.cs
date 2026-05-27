@@ -94,7 +94,6 @@ namespace appTurismo.Services
         {
             try
             {
-                // 1. Obtener ID del Rol vía RPC (esto es muy eficiente)
                 var resolvedRoleIdStr = await _supabaseClient.Rpc<string>("get_role_id_by_name", new Dictionary<string, object>
         {
             { "role_name", roleName.ToLower().Trim() }
@@ -103,7 +102,6 @@ namespace appTurismo.Services
                 if (string.IsNullOrEmpty(resolvedRoleIdStr)) return false;
                 Guid resolvedRoleId = Guid.Parse(resolvedRoleIdStr);
 
-                // 2. Empaquetar datos en metadatos (Esto es lo que hace que tu Trigger funcione)
                 var options = new Supabase.Gotrue.SignUpOptions
                 {
                     Data = new Dictionary<string, object>
@@ -116,8 +114,6 @@ namespace appTurismo.Services
             }
                 };
 
-                // 3. Registro. ¡YA NO HAGAS .Insert() MANUAL! 
-                // El trigger en la base de datos creará la fila por ti.
                 var response = await _supabaseClient.Auth.SignUp(email, password, options);
 
                 return response?.User != null;

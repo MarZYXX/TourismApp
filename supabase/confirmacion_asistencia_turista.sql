@@ -1,6 +1,3 @@
--- Ejecuta este archivo completo en Supabase SQL Editor antes de probar
--- los botones Confirmar asistencia y No asistire de la aplicacion.
-
 alter table public.grupo_participantes
   add column if not exists confirmacion_asistencia text not null default 'Pendiente';
 

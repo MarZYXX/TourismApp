@@ -5,8 +5,6 @@ namespace appTurismo.DataMapper
 {
     public class UserMapper
     {
-        //Might delete the async if it proves unnecessary at final release, but currently no issues so it stays
-
         private IStorageService _storageService;
         public UserMapper(IStorageService storageService)
         {

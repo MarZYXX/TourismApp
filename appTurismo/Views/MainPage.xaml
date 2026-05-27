@@ -11,7 +11,6 @@
     </ContentPage.ToolbarItems>
 
     <Grid RowDefinitions="*,Auto">
-        <!-- Wrap CollectionView in RefreshView for pull-to-refresh functionality -->
         <RefreshView Grid.Row="0"
                      IsRefreshing="{Binding IsRefreshing, Mode=TwoWay}"
                      Command="{Binding GetUsersCommand}">

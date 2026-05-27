@@ -25,7 +25,6 @@ namespace appTurismo.Helpers
             try
             {
                 var session = JsonConvert.DeserializeObject<Session>(json);
-                // Return null if token is expired completely
                 if (session?.CreatedAt.AddSeconds(session.ExpiresIn) <= DateTime.UtcNow)
                 {
                     return null;

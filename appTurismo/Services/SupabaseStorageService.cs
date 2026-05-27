@@ -8,7 +8,6 @@ namespace appTurismo.Services
     {
         private readonly Supabase.Client _supabaseClient;
 
-        // Flag to track initialization state
         private bool _isInitialized = false;
 
         public SupabaseStorageService(Supabase.Client supabaseClient)
@@ -40,7 +39,6 @@ namespace appTurismo.Services
             return bytes;
         }
 
-        // Initialize method to be called explicitly, can be awaited
         public async Task InitializeAsync()
         {
             if (!_isInitialized)
@@ -48,11 +46,10 @@ namespace appTurismo.Services
                 try
                 {
                     await _supabaseClient.InitializeAsync();
-                    _isInitialized = true; // Set initialization flag
+                    _isInitialized = true;
                 }
                 catch (Exception ex)
                 {
-                    // Handle any initialization errors here
                     Console.WriteLine($"Initialization failed: {ex.Message}");
                     throw new InvalidOperationException("Failed to initialize Supabase client.", ex);
                 }

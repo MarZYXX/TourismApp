@@ -35,19 +35,16 @@ namespace appTurismo
                 AutoConnectRealtime = true
             };
 
-            // Instantiate client cleanly without blocking the engine pipeline
             var supabaseClient = new Supabase.Client(supabaseUrl, supabaseKey, options);
 
             builder.Services.AddSingleton(supabaseClient);
 
-            // 2. Base Core System Registrations
             builder.Services.AddSingleton<Supabase.Client>(supabaseClient);
             builder.Services.AddSingleton<IUserService, SupabaseUserService>();
             builder.Services.AddSingleton<IConnectivity>(Connectivity.Current);
             builder.Services.AddSingleton<IStorageService, SupabaseStorageService>();
             builder.Services.AddSingleton<UserMapper>();
 
-            // 3. UI Views & ViewModels registration
             builder.Services.AddSingleton<MainViewModel>();
             builder.Services.AddSingleton<MainPage>();
 
